@@ -1108,16 +1108,13 @@ async def scam(event):
             "/", "#", "@", "!"):
         input_str = event.pattern_match.group(1)
         input_time = event.pattern_match.group(2)
-        action = "typing"
         try:
-            input_time = int(input_time)
-            if (input_time > 0):
-                action_time = input_time
+            time = int(input_time)
+            if (time > 0):
                 await event.delete()
                 async with event.client.action(event.chat_id, action):
-                    await asyncio.sleep(int(time))
+                    await asyncio.sleep(time)
         except BaseException:
-            await event.edit("`Wrong Syntax !!`")
             return
 
 
