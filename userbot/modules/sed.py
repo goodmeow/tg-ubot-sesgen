@@ -116,7 +116,7 @@ async def sed(command):
                 return
             if text:
                 await command.edit(f"Did you mean? \n\n{text}")
-                sleep(2.5)
+                await sleep(3)
                 await command.edit(text)
 
 CMD_HELP.update({
