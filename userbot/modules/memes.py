@@ -1107,28 +1107,29 @@ async def scam(event):
     if not event.text[0].isalpha() and event.text[0] not in (
             "/", "#", "@", "!"):
         options = ['typing', 'contact', 'game', 'location', 'voice', 'round', 'video', 'photo', 'document', 'cancel']
-        input_str = event.pattern_match.group(1).split()
-        if len(input_str) == 0: # Let bot decide action and time
-            action = random.choice(options)
-            time = random.randint(30, 60)
-        elif len(input_str) == 1: # User decides time/action
+        input_str = event.pattern_match.group(1)
+        args = input_str.split()
+        if len(args) is 0: # Let bot decide action and time
+            scam_action = random.choice(options)
+            scam_time = random.randint(30, 60)
+        elif len(args) is 1: # User decides time/action
             try:
-                action = str(input_str).lower()
-                time = random.randint(30, 60)
+                scam_action = str(args[0]).lower()
+                scam_time = random.randint(30, 60)
             except ValueError:
-                action = random.choice(options)
-                time = float(input_str)
-        elif len(input_str) == 2: # User decides both action and time
-            action = str(input_str[0]).lower()
-            time = float(input_str[1])
+                scam_action = random.choice(options)
+                scam_time = int(args[0])
+        elif len(args) is 2: # User decides both action and time
+            scam_action = str(args[0]).lower()
+            scam_time = int(args[1])
         else:
             await event.edit("`Invalid Syntax !!`")
             return
         try:
-            if (time > 0):
+            if (scam_time > 0):
                 await event.delete()
-                async with event.client.action(event.chat_id, action):
-                    await asyncio.sleep(time)
+                async with event.client.action(event.chat_id, scam_action):
+                    await asyncio.sleep(scam_time)
         except BaseException:
             return
 
