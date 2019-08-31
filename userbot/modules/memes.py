@@ -1100,16 +1100,31 @@ async def let_me_google_that_for_you(lmgtfy_q):
         await lmgtfy_q.edit(f"[{query}]({r.json()['shorturl']})")
 
 
-@register(pattern=r".scam (.*) (.*)", outgoing=True)
+@register(pattern=r".scam(?: |$)(.*)", outgoing=True)
 @errors_handler
 async def scam(event):
     """ Just a small command to fake chat actions for fun !! """
     if not event.text[0].isalpha() and event.text[0] not in (
             "/", "#", "@", "!"):
-        input_str = event.pattern_match.group(1)
-        input_time = event.pattern_match.group(2)
+        options = ['typing', 'contact', 'game', 'location', 'voice', 'round', 'video', 'photo', 'document', 'cancel']
+        input_str = event.pattern_match.group(1).split()
+        if len(input_str) == 0: # Let bot decide action and time
+            action = random.choice(options)
+            time = random.randint(30, 60)
+        elif len(input_str) == 1: # User decides time/action
+            try:
+                action = str(input_str).lower()
+                time = random.randint(30, 60)
+            except ValueError:
+                action = random.choice(options)
+                time = float(input_str)
+        elif len(input_str) == 2: # User decides both action and time
+            action = str(input_str[0]).lower()
+            time = float(input_str[1])
+        else:
+            await event.edit("`Invalid Syntax !!`")
+            return
         try:
-            time = int(input_time)
             if (time > 0):
                 await event.delete()
                 async with event.client.action(event.chat_id, action):
