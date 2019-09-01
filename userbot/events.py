@@ -51,7 +51,7 @@ def errors_handler(func):
                 'date': datetime.datetime.now()
             }
 
-            text = "**USERBOT CRASH REPORT**\n\n"
+            text = "**USERBOT ERROR REPORT**\n\n"
 
             link = "[here](https://t.me/PaperplaneExtendedSupport)"
             text += "If you wanna you can report it"
