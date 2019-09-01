@@ -22,10 +22,8 @@ async def tmeme(e):
         await e.delete()
         if BOTLOG:
             await e.client.send_message(
-                BOTLOG_CHATID,
-                "#TSPAM \n\n"
-                "TSpam was executed successfully"
-            )
+                BOTLOG_CHATID, "#TSPAM \n\n"
+                "TSpam was executed successfully")
 
 
 @register(outgoing=True, pattern="^.spam (.*)")
@@ -38,10 +36,8 @@ async def spammer(e):
         await e.delete()
         if BOTLOG:
             await e.client.send_message(
-                BOTLOG_CHATID,
-                "#SPAM \n\n"
-                "Spam was executed successfully"
-            )
+                BOTLOG_CHATID, "#SPAM \n\n"
+                "Spam was executed successfully")
 
 
 @register(outgoing=True, pattern="^.picspam")
@@ -57,10 +53,8 @@ async def tiny_pic_spam(e):
         await e.delete()
         if BOTLOG:
             await e.client.send_message(
-                BOTLOG_CHATID,
-                "#PICSPAM \n\n"
-                "PicSpam was executed successfully"
-            )
+                BOTLOG_CHATID, "#PICSPAM \n\n"
+                "PicSpam was executed successfully")
 
 
 @register(outgoing=True, pattern="^.delayspam (.*)")
@@ -76,13 +70,13 @@ async def spammer(e):
         await e.delete()
         if BOTLOG:
             await e.client.send_message(
-                BOTLOG_CHATID,
-                "#DelaySPAM \n\n"
-                "DelaySpam was executed successfully"
-            )
+                BOTLOG_CHATID, "#DelaySPAM \n\n"
+                "DelaySpam was executed successfully")
+
 
 CMD_HELP.update({
-    "spam": ".tspam <text>\
+    "spam":
+    ".tspam <text>\
 \nUsage: Spam the text letter by letter.\
 \n\n.spam <count> <text>\
 \nUsage: Floods text in the chat !!\

@@ -15,11 +15,13 @@ class Snips(BASE):
     media_access_hash = Column(UnicodeText)
     media_file_reference = Column(LargeBinary)
 
-    def __init__(
-        self,
-        snip, reply, snip_type,
-        media_id=None, media_access_hash=None, media_file_reference=None
-    ):
+    def __init__(self,
+                 snip,
+                 reply,
+                 snip_type,
+                 media_id=None,
+                 media_access_hash=None,
+                 media_file_reference=None):
         self.snip = snip
         self.reply = reply
         self.snip_type = snip_type
@@ -45,22 +47,12 @@ def get_snips():
         SESSION.close()
 
 
-def add_snip(
-        keyword,
-        reply,
-        snip_type,
-        media_id,
-        media_access_hash,
-        media_file_reference):
+def add_snip(keyword, reply, snip_type, media_id, media_access_hash,
+             media_file_reference):
     to_check = get_snip(keyword)
     if not to_check:
-        adder = Snips(
-            keyword,
-            reply,
-            snip_type,
-            media_id,
-            media_access_hash,
-            media_file_reference)
+        adder = Snips(keyword, reply, snip_type, media_id, media_access_hash,
+                      media_file_reference)
         SESSION.add(adder)
         SESSION.commit()
         return True
@@ -68,13 +60,8 @@ def add_snip(
         rem = SESSION.query(Snips).filter(Snips.snip == keyword)
         SESSION.delete(rem)
         SESSION.commit()
-        adder = Snips(
-            keyword,
-            reply,
-            snip_type,
-            media_id,
-            media_access_hash,
-            media_file_reference)
+        adder = Snips(keyword, reply, snip_type, media_id, media_access_hash,
+                      media_file_reference)
         SESSION.add(adder)
         SESSION.commit()
         return False

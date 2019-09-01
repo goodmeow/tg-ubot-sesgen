@@ -3,14 +3,12 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 # From UniBorg by @Spechide
-
 """ Userbot module containing commands for keeping global notes. """
 
 from telethon import utils
 from telethon.tl import types
 from userbot.events import register, errors_handler
 from userbot import CMD_HELP
-
 
 TYPE_TEXT = 0
 TYPE_PHOTO = 1
@@ -29,17 +27,13 @@ async def on_snip(event):
     snip = get_snip(name)
     if snip:
         if snip.snip_type == TYPE_PHOTO:
-            media = types.InputPhoto(
-                int(snip.media_id),
-                int(snip.media_access_hash),
-                snip.media_file_reference
-            )
+            media = types.InputPhoto(int(snip.media_id),
+                                     int(snip.media_access_hash),
+                                     snip.media_file_reference)
         elif snip.snip_type == TYPE_DOCUMENT:
-            media = types.InputDocument(
-                int(snip.media_id),
-                int(snip.media_access_hash),
-                snip.media_file_reference
-            )
+            media = types.InputDocument(int(snip.media_id),
+                                        int(snip.media_access_hash),
+                                        snip.media_file_reference)
         else:
             media = None
 
@@ -48,12 +42,10 @@ async def on_snip(event):
         if not message_id_to_reply:
             message_id_to_reply = None
 
-        await event.client.send_message(
-            event.chat_id,
-            snip.reply,
-            reply_to=message_id_to_reply,
-            file=media
-        )
+        await event.client.send_message(event.chat_id,
+                                        snip.reply,
+                                        reply_to=message_id_to_reply,
+                                        file=media)
         await event.delete()
 
 
@@ -88,13 +80,8 @@ async def on_snip_save(event):
 
         success = "`Snip {} successfully. Use` **${}** `anywhere to get it`"
 
-        if add_snip(
-                name,
-                snip['text'],
-                snip['type'],
-                snip.get('id'),
-                snip.get('hash'),
-                snip.get('fr')) is False:
+        if add_snip(name, snip['text'], snip['type'], snip.get('id'),
+                    snip.get('hash'), snip.get('fr')) is False:
             await event.edit(success.format('updated', name))
         else:
             await event.edit(success.format('saved', name))
@@ -104,8 +91,8 @@ async def on_snip_save(event):
 @errors_handler
 async def on_snip_list(event):
     """ For .snips command, lists snips saved by you. """
-    if not event.text[0].isalpha() and event.text[0] not in (
-            "/", "#", "@", "!"):
+    if not event.text[0].isalpha() and event.text[0] not in ("/", "#", "@",
+                                                             "!"):
         try:
             from userbot.modules.sql_helper.snips_sql import get_snips
         except AttributeError:
@@ -139,8 +126,10 @@ async def on_snip_delete(event):
     else:
         await event.edit(f"`Couldn't find snip:` **{name}**")
 
+
 CMD_HELP.update({
-    "snips": "\
+    "snips":
+    "\
 $<snip_name>\
 \nUsage: Gets the specified snip.\
 \n\n.snip <name>\
@@ -149,4 +138,5 @@ $<snip_name>\
 \nUsage: Gets all saved snips.\
 \n\n.remsnip <snip_name>\
 \nUsage: Deletes the specified snip.\
-"})
+"
+})

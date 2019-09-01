@@ -48,12 +48,7 @@ def speed_convert(size):
     """
     power = 2**10
     zero = 0
-    units = {
-        0: '',
-        1: 'Kb/s',
-        2: 'Mb/s',
-        3: 'Gb/s',
-        4: 'Tb/s'}
+    units = {0: '', 1: 'Kb/s', 2: 'Mb/s', 3: 'Gb/s', 4: 'Tb/s'}
     while size > power:
         size /= power
         zero += 1
@@ -63,15 +58,13 @@ def speed_convert(size):
 @register(outgoing=True, pattern="^.nearestdc$")
 @errors_handler
 async def neardc(event):
-    if not event.text[0].isalpha() and event.text[0] not in (
-            "/", "#", "@", "!"):
+    if not event.text[0].isalpha() and event.text[0] not in ("/", "#", "@",
+                                                             "!"):
         """ For .nearestdc command, get the nearest datacenter information. """
         result = await event.client(functions.help.GetNearestDcRequest())
-        await event.edit(
-            f"Country : `{result.country}` \n"
-            f"Nearest Datacenter : `{result.nearest_dc}` \n"
-            f"This Datacenter : `{result.this_dc}`"
-        )
+        await event.edit(f"Country : `{result.country}` \n"
+                         f"Nearest Datacenter : `{result.nearest_dc}` \n"
+                         f"This Datacenter : `{result.this_dc}`")
 
 
 @register(outgoing=True, pattern="^.pingme$")
@@ -85,15 +78,17 @@ async def pingme(pong):
         duration = (end - start).microseconds / 1000
         await pong.edit("`Pong!\n%sms`" % (duration))
 
+
+CMD_HELP.update(
+    {"speed": ".speed\
+    \nUsage: Does a speedtest and shows the results."})
 CMD_HELP.update({
-    "speed": ".speed\
-    \nUsage: Does a speedtest and shows the results."
-})
-CMD_HELP.update({
-    "nearestdc": ".nearestdc\
+    "nearestdc":
+    ".nearestdc\
     \nUsage: Finds the nearest datacenter from your server."
 })
 CMD_HELP.update({
-    "pingme": ".pingme\
+    "pingme":
+    ".pingme\
     \nUsage: Shows how long it takes to ping your bot."
 })

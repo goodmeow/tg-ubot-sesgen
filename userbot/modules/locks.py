@@ -10,8 +10,8 @@ from userbot.events import register, errors_handler
 @register(outgoing=True, pattern=r"^.lock ?(.*)")
 @errors_handler
 async def locks(event):
-    if not event.text[0].isalpha() and event.text[0] not in (
-            "/", "#", "@", "!"):
+    if not event.text[0].isalpha() and event.text[0] not in ("/", "#", "@",
+                                                             "!"):
         input_str = event.pattern_match.group(1)
         peer_id = event.chat_id
         msg = None
@@ -67,7 +67,7 @@ async def locks(event):
             changeinfo = True
             what = "everything"
 
-        banned_rights = ChatBannedRights(
+        lock_rights = ChatBannedRights(
             until_date=None,
             send_messages=msg,
             send_media=media,
@@ -81,23 +81,21 @@ async def locks(event):
             change_info=changeinfo,
         )
         try:
-            result = await event.client(EditChatDefaultBannedRightsRequest(
-                peer=peer_id,
-                banned_rights=banned_rights
-            ))
-        except BaseException:
-            await event.edit("`Do I have proper rights fot that ??`")
-        else:
+            await event.client(
+                EditChatDefaultBannedRightsRequest(peer=peer_id,
+                                                   banned_rights=lock_rights))
             await event.edit(f"`Locked {what} for this chat !!`")
             await sleep(3)
             await event.delete()
+        except BaseException:
+            await event.edit("`Do I have proper rights for that ??`")
 
 
 @register(outgoing=True, pattern=r"^.unlock ?(.*)")
 @errors_handler
 async def rem_locks(event):
-    if not event.text[0].isalpha() and event.text[0] not in (
-            "/", "#", "@", "!"):
+    if not event.text[0].isalpha() and event.text[0] not in ("/", "#", "@",
+                                                             "!"):
         input_str = event.pattern_match.group(1)
         peer_id = event.chat_id
         msg = None
@@ -153,7 +151,7 @@ async def rem_locks(event):
             changeinfo = False
             what = "everything"
 
-        banned_rights = ChatBannedRights(
+        unlock_rights = ChatBannedRights(
             until_date=None,
             send_messages=msg,
             send_media=media,
@@ -167,21 +165,23 @@ async def rem_locks(event):
             change_info=changeinfo,
         )
         try:
-            result = await event.client(EditChatDefaultBannedRightsRequest(
-                peer=peer_id,
-                banned_rights=banned_rights
-            ))
-        except BaseException:
-            await event.edit("`Do I have proper rights fot that ??`")
-        else:
+            await event.client(
+                EditChatDefaultBannedRightsRequest(peer=peer_id,
+                                                   banned_rights=unlock_rights)
+            )
             await event.edit(f"`Unlocked {what} for this chat !!`")
             await sleep(3)
             await event.delete()
+        except BaseException:
+            await event.edit("`Do I have proper rights for that ??`")
+
 
 CMD_HELP.update({
-    "locks": ".lock <all (or) type(s)> or .unlock <all (or) type(s)>\
+    "locks":
+    ".lock <all (or) type(s)> or .unlock <all (or) type(s)>\
 \nUsage: Allows you to lock/unlock some common message types in the chat.\
 [NOTE: Requires proper admin rights in the chat !!]\
 \n\nAvailable message types to lock/unlock are: \
 \n`all, msg, media, sticker, gif, game, inline, poll, invite, pin, info`\
-"})
+"
+})

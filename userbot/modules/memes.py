@@ -4,7 +4,6 @@
 # you may not use this file except in compliance with the License.
 #
 #
-
 """ Userbot module for having some fun with people. """
 
 import asyncio
@@ -35,116 +34,119 @@ METOOSTR = [
     "Me rn",
 ]
 
-ZALG_LIST = [["̖",
-              " ̗",
-              " ̘",
-              " ̙",
-              " ̜",
-              " ̝",
-              " ̞",
-              " ̟",
-              " ̠",
-              " ̤",
-              " ̥",
-              " ̦",
-              " ̩",
-              " ̪",
-              " ̫",
-              " ̬",
-              " ̭",
-              " ̮",
-              " ̯",
-              " ̰",
-              " ̱",
-              " ̲",
-              " ̳",
-              " ̹",
-              " ̺",
-              " ̻",
-              " ̼",
-              " ͅ",
-              " ͇",
-              " ͈",
-              " ͉",
-              " ͍",
-              " ͎",
-              " ͓",
-              " ͔",
-              " ͕",
-              " ͖",
-              " ͙",
-              " ͚",
-              " ",
-              ],
-             [" ̍",
-              " ̎",
-              " ̄",
-              " ̅",
-              " ̿",
-              " ̑",
-              " ̆",
-              " ̐",
-              " ͒",
-              " ͗",
-              " ͑",
-              " ̇",
-              " ̈",
-              " ̊",
-              " ͂",
-              " ̓",
-              " ̈́",
-              " ͊",
-              " ͋",
-              " ͌",
-              " ̃",
-              " ̂",
-              " ̌",
-              " ͐",
-              " ́",
-              " ̋",
-              " ̏",
-              " ̽",
-              " ̉",
-              " ͣ",
-              " ͤ",
-              " ͥ",
-              " ͦ",
-              " ͧ",
-              " ͨ",
-              " ͩ",
-              " ͪ",
-              " ͫ",
-              " ͬ",
-              " ͭ",
-              " ͮ",
-              " ͯ",
-              " ̾",
-              " ͛",
-              " ͆",
-              " ̚",
-              ],
-             [" ̕",
-              " ̛",
-              " ̀",
-              " ́",
-              " ͘",
-              " ̡",
-              " ̢",
-              " ̧",
-              " ̨",
-              " ̴",
-              " ̵",
-              " ̶",
-              " ͜",
-              " ͝",
-              " ͞",
-              " ͟",
-              " ͠",
-              " ͢",
-              " ̸",
-              " ̷",
-              " ͡",
-              ]]
+ZALG_LIST = [[
+    "̖",
+    " ̗",
+    " ̘",
+    " ̙",
+    " ̜",
+    " ̝",
+    " ̞",
+    " ̟",
+    " ̠",
+    " ̤",
+    " ̥",
+    " ̦",
+    " ̩",
+    " ̪",
+    " ̫",
+    " ̬",
+    " ̭",
+    " ̮",
+    " ̯",
+    " ̰",
+    " ̱",
+    " ̲",
+    " ̳",
+    " ̹",
+    " ̺",
+    " ̻",
+    " ̼",
+    " ͅ",
+    " ͇",
+    " ͈",
+    " ͉",
+    " ͍",
+    " ͎",
+    " ͓",
+    " ͔",
+    " ͕",
+    " ͖",
+    " ͙",
+    " ͚",
+    " ",
+],
+             [
+                 " ̍",
+                 " ̎",
+                 " ̄",
+                 " ̅",
+                 " ̿",
+                 " ̑",
+                 " ̆",
+                 " ̐",
+                 " ͒",
+                 " ͗",
+                 " ͑",
+                 " ̇",
+                 " ̈",
+                 " ̊",
+                 " ͂",
+                 " ̓",
+                 " ̈́",
+                 " ͊",
+                 " ͋",
+                 " ͌",
+                 " ̃",
+                 " ̂",
+                 " ̌",
+                 " ͐",
+                 " ́",
+                 " ̋",
+                 " ̏",
+                 " ̽",
+                 " ̉",
+                 " ͣ",
+                 " ͤ",
+                 " ͥ",
+                 " ͦ",
+                 " ͧ",
+                 " ͨ",
+                 " ͩ",
+                 " ͪ",
+                 " ͫ",
+                 " ͬ",
+                 " ͭ",
+                 " ͮ",
+                 " ͯ",
+                 " ̾",
+                 " ͛",
+                 " ͆",
+                 " ̚",
+             ],
+             [
+                 " ̕",
+                 " ̛",
+                 " ̀",
+                 " ́",
+                 " ͘",
+                 " ̡",
+                 " ̢",
+                 " ̧",
+                 " ̨",
+                 " ̴",
+                 " ̵",
+                 " ̶",
+                 " ͜",
+                 " ͝",
+                 " ͞",
+                 " ͟",
+                 " ͠",
+                 " ͢",
+                 " ̸",
+                 " ̷",
+                 " ͡",
+             ]]
 
 EMOJIS = [
     "😂",
@@ -478,17 +480,13 @@ SLAP_TEMPLATES = [
     "grabs up a {item} and {hits} {victim} with it.",
     "ties {victim} to a chair and {throws} a {item} at them.",
     "gave a friendly push to help {victim} learn to swim in lava.",
-    "sent {victim} to /dev/null.",
-    "sent {victim} down the memory hole.",
-    "beheaded {victim}.",
-    "threw {victim} off a building.",
+    "sent {victim} to /dev/null.", "sent {victim} down the memory hole.",
+    "beheaded {victim}.", "threw {victim} off a building.",
     "replaced all of {victim}'s music with Nickelback.",
-    "spammed {victim}'s email.",
-    "made {victim} a knuckle sandwich.",
+    "spammed {victim}'s email.", "made {victim} a knuckle sandwich.",
     "slapped {victim} with pure nothing.",
     "hit {victim} with a small, interstellar spaceship.",
-    "quickscoped {victim}.",
-    "put {victim} in check-mate.",
+    "quickscoped {victim}.", "put {victim} in check-mate.",
     "RSA-encrypted {victim} and deleted the private key.",
     "put {victim} in the friendzone.",
     "slaps {victim} with a DMCA takedown request!"
@@ -548,8 +546,8 @@ HIT = [
 @errors_handler
 async def univsaye(cowmsg):
     """ For .cowsay module, userbot wrapper for cow which says things. """
-    if not cowmsg.text[0].isalpha() and cowmsg.text[0] not in (
-            "/", "#", "@", "!"):
+    if not cowmsg.text[0].isalpha() and cowmsg.text[0] not in ("/", "#", "@",
+                                                               "!"):
         arg = cowmsg.pattern_match.group(1).lower()
         text = cowmsg.pattern_match.group(2)
 
@@ -576,8 +574,8 @@ async def kek(keks):
 @register(outgoing=True, pattern=r"^.coinflip (.*)")
 @errors_handler
 async def coin(event):
-    if not event.text[0].isalpha() and event.text[0] not in (
-            "/", "#", "@", "!"):
+    if not event.text[0].isalpha() and event.text[0] not in ("/", "#", "@",
+                                                             "!"):
         if event.fwd_from:
             return
         r = random.randint(1, 100)
@@ -586,16 +584,22 @@ async def coin(event):
             input_str = input_str.lower()
         if r % 2 == 1:
             if input_str == "heads":
-                await event.edit("The coin landed on: **Heads**.\nYou were correct.")
+                await event.edit(
+                    "The coin landed on: **Heads**.\nYou were correct.")
             elif input_str == "tails":
-                await event.edit("The coin landed on: **Heads**.\nYou weren't correct, try again ...")
+                await event.edit(
+                    "The coin landed on: **Heads**.\nYou weren't correct, try again ..."
+                )
             else:
                 await event.edit("The coin landed on: **Heads**.")
         elif r % 2 == 0:
             if input_str == "tails":
-                await event.edit("The coin landed on: **Tails**.\nYou were correct.")
+                await event.edit(
+                    "The coin landed on: **Tails**.\nYou were correct.")
             elif input_str == "heads":
-                await event.edit("The coin landed on: **Tails**.\nYou weren't correct, try again ...")
+                await event.edit(
+                    "The coin landed on: **Tails**.\nYou weren't correct, try again ..."
+                )
             else:
                 await event.edit("The coin landed on: **Tails**.")
         else:
@@ -605,8 +609,8 @@ async def coin(event):
 @register(pattern="^.slap(?: |$)(.*)", outgoing=True)
 @errors_handler
 async def who(event):
-    if not event.text[0].isalpha() and event.text[0] not in (
-            "/", "#", "@", "!"):
+    if not event.text[0].isalpha() and event.text[0] not in ("/", "#", "@",
+                                                             "!"):
         """ slaps a user, or get slapped if not a reply. """
         if event.fwd_from:
             return
@@ -622,14 +626,17 @@ async def who(event):
             await event.edit(caption)
 
         except BaseException:
-            await event.edit("`Can't slap this person, need to fetch some sticks and stones !!`")
+            await event.edit(
+                "`Can't slap this person, need to fetch some sticks and stones !!`"
+            )
 
 
 async def get_user(event):
     """ Get the user from argument or replied message. """
     if event.reply_to_msg_id:
         previous_message = await event.get_reply_message()
-        replied_user = await event.client(GetFullUserRequest(previous_message.from_id))
+        replied_user = await event.client(
+            GetFullUserRequest(previous_message.from_id))
     else:
         user = event.pattern_match.group(1)
 
@@ -643,15 +650,15 @@ async def get_user(event):
         if event.message.entities is not None:
             probable_user_mention_entity = event.message.entities[0]
 
-            if isinstance(
-                    probable_user_mention_entity,
-                    MessageEntityMentionName):
+            if isinstance(probable_user_mention_entity,
+                          MessageEntityMentionName):
                 user_id = probable_user_mention_entity.user_id
                 replied_user = await event.client(GetFullUserRequest(user_id))
                 return replied_user
         try:
             user_object = await event.client.get_entity(user)
-            replied_user = await event.client(GetFullUserRequest(user_object.id))
+            replied_user = await event.client(
+                GetFullUserRequest(user_object.id))
 
         except (TypeError, ValueError):
             await event.edit("`I don't slap aliens, they ugly AF !!`")
@@ -676,8 +683,8 @@ async def slap(replied_user, event):
     hit = random.choice(HIT)
     throw = random.choice(THROW)
 
-    caption = "..." + temp.format(victim=slapped,
-                                  item=item, hits=hit, throws=throw)
+    caption = "..." + temp.format(
+        victim=slapped, item=item, hits=hit, throws=throw)
 
     return caption
 
@@ -695,8 +702,8 @@ async def lol(lel):
 @register(outgoing=True, pattern="^.decide(?: |$)(.*)")
 @errors_handler
 async def decide(event):
-    if not event.text[0].isalpha() and event.text[0] not in (
-            "/", "#", "@", "!"):
+    if not event.text[0].isalpha() and event.text[0] not in ("/", "#", "@",
+                                                             "!"):
         if event.fwd_from:
             return
         message = event.pattern_match.group(1)
@@ -712,12 +719,10 @@ async def decide(event):
             except BaseException:
                 await event.edit("`Available decisions:` *yes*, *no*, *maybe*")
                 return
-        await event.client.send_message(
-            event.chat_id,
-            str(r["answer"]).upper(),
-            reply_to=message_id,
-            file=r["image"]
-        )
+        await event.client.send_message(event.chat_id,
+                                        str(r["answer"]).upper(),
+                                        reply_to=message_id,
+                                        file=r["image"])
         await event.delete()
 
 
@@ -820,8 +825,8 @@ async def vapor(vpr):
 @errors_handler
 async def stretch(stret):
     """ Stretch it."""
-    if not stret.text[0].isalpha() and stret.text[0] not in (
-            "/", "#", "@", "!"):
+    if not stret.text[0].isalpha() and stret.text[0] not in ("/", "#", "@",
+                                                             "!"):
         textx = await stret.get_reply_message()
         message = stret.text
         message = stret.pattern_match.group(1)
@@ -834,11 +839,8 @@ async def stretch(stret):
             return
 
         count = random.randint(3, 10)
-        reply_text = re.sub(
-            r"([aeiouAEIOUａｅｉｏｕＡＥＩＯＵаеиоуюяыэё])",
-            (r"\1" * count),
-            message
-        )
+        reply_text = re.sub(r"([aeiouAEIOUａｅｉｏｕＡＥＩＯＵаеиоуюяыэё])",
+                            (r"\1" * count), message)
         await stret.edit(reply_text)
 
 
@@ -887,8 +889,8 @@ async def zal(zgfy):
 @errors_handler
 async def hoi(hello):
     """ Greet everyone! """
-    if not hello.text[0].isalpha() and hello.text[0] not in (
-            "/", "#", "@", "!"):
+    if not hello.text[0].isalpha() and hello.text[0] not in ("/", "#", "@",
+                                                             "!"):
         await hello.edit(random.choice(HELLOSTR))
 
 
@@ -921,8 +923,8 @@ async def faces(owo):
 @errors_handler
 async def react_meme(react):
     """ Make your userbot react to everything. """
-    if not react.text[0].isalpha() and react.text[0] not in (
-            "/", "#", "@", "!"):
+    if not react.text[0].isalpha() and react.text[0] not in ("/", "#", "@",
+                                                             "!"):
         await react.edit(random.choice(FACEREACTS))
 
 
@@ -946,8 +948,8 @@ async def runner_lol(run):
 @errors_handler
 async def metoo(hahayes):
     """ Haha yes """
-    if not hahayes.text[0].isalpha() and hahayes.text[0] not in (
-            "/", "#", "@", "!"):
+    if not hahayes.text[0].isalpha() and hahayes.text[0] not in ("/", "#", "@",
+                                                                 "!"):
         await hahayes.edit(random.choice(METOOSTR))
 
 
@@ -970,8 +972,8 @@ async def iqless(e):
 @register(outgoing=True, pattern="^.moon$")
 @errors_handler
 async def _(event):
-    if not event.text[0].isalpha() and event.text[0] not in (
-            "/", "#", "@", "!"):
+    if not event.text[0].isalpha() and event.text[0] not in ("/", "#", "@",
+                                                             "!"):
         if event.fwd_from:
             return
         deq = deque(list("🌗🌘🌑🌒🌓🌔🌕🌖"))
@@ -987,8 +989,8 @@ async def _(event):
 @register(outgoing=True, pattern="^.clock$")
 @errors_handler
 async def _(event):
-    if not event.text[0].isalpha() and event.text[0] not in (
-            "/", "#", "@", "!"):
+    if not event.text[0].isalpha() and event.text[0] not in ("/", "#", "@",
+                                                             "!"):
         if event.fwd_from:
             return
         deq = deque(list("🕙🕘🕗🕖🕕🕔🕓🕒🕑🕐🕛"))
@@ -1031,8 +1033,8 @@ async def spongemocktext(mock):
 @errors_handler
 async def claptext(memereview):
     """ Praise people! """
-    if not memereview.text[0].isalpha(
-    ) and memereview.text[0] not in ("/", "#", "@", "!"):
+    if not memereview.text[0].isalpha() and memereview.text[0] not in (
+            "/", "#", "@", "!"):
         textx = await memereview.get_reply_message()
         message = memereview.pattern_match.group(1)
         if message:
@@ -1066,26 +1068,17 @@ async def payf(e):
     if not e.text[0].isalpha() and e.text[0] not in ("/", "#", "@", "!"):
         paytext = e.pattern_match.group(1)
         pay = "{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}\n{}".format(
-            paytext * 8,
-            paytext * 8,
-            paytext * 2,
-            paytext * 2,
-            paytext * 2,
-            paytext * 6,
-            paytext * 6,
-            paytext * 2,
-            paytext * 2,
-            paytext * 2,
-            paytext * 2,
-            paytext * 2)
+            paytext * 8, paytext * 8, paytext * 2, paytext * 2, paytext * 2,
+            paytext * 6, paytext * 6, paytext * 2, paytext * 2, paytext * 2,
+            paytext * 2, paytext * 2)
         await e.edit(pay)
 
 
 @register(outgoing=True, pattern="^.lfy (.*)")
 @errors_handler
 async def let_me_google_that_for_you(lmgtfy_q):
-    if not lmgtfy_q.text[0].isalpha(
-    ) and lmgtfy_q.text[0] not in ("/", "#", "@", "!"):
+    if not lmgtfy_q.text[0].isalpha() and lmgtfy_q.text[0] not in ("/", "#",
+                                                                   "@", "!"):
         textx = await lmgtfy_q.get_reply_message()
         qry = lmgtfy_q.pattern_match.group(1)
         if qry:
@@ -1104,22 +1097,25 @@ async def let_me_google_that_for_you(lmgtfy_q):
 @errors_handler
 async def scam(event):
     """ Just a small command to fake chat actions for fun !! """
-    if not event.text[0].isalpha() and event.text[0] not in (
-            "/", "#", "@", "!"):
-        options = ['typing', 'contact', 'game', 'location', 'voice', 'round', 'video', 'photo', 'document', 'cancel']
+    if not event.text[0].isalpha() and event.text[0] not in ("/", "#", "@",
+                                                             "!"):
+        options = [
+            'typing', 'contact', 'game', 'location', 'voice', 'round', 'video',
+            'photo', 'document', 'cancel'
+        ]
         input_str = event.pattern_match.group(1)
         args = input_str.split()
-        if len(args) is 0: # Let bot decide action and time
+        if len(args) is 0:  # Let bot decide action and time
             scam_action = random.choice(options)
             scam_time = random.randint(30, 60)
-        elif len(args) is 1: # User decides time/action
+        elif len(args) is 1:  # User decides time/action
             try:
                 scam_action = str(args[0]).lower()
                 scam_time = random.randint(30, 60)
             except ValueError:
                 scam_action = random.choice(options)
                 scam_time = int(args[0])
-        elif len(args) is 2: # User decides both action and time
+        elif len(args) is 2:  # User decides both action and time
             scam_action = str(args[0]).lower()
             scam_time = int(args[1])
         else:
@@ -1138,8 +1134,8 @@ async def scam(event):
 @errors_handler
 async def typewriter(typew):
     """ Just a small command to make your keyboard become a typewriter! """
-    if not typew.text[0].isalpha() and typew.text[0] not in (
-            "/", "#", "@", "!"):
+    if not typew.text[0].isalpha() and typew.text[0] not in ("/", "#", "@",
+                                                             "!"):
         textx = await typew.get_reply_message()
         message = typew.pattern_match.group(1)
         if message:
@@ -1164,7 +1160,8 @@ async def typewriter(typew):
 
 
 CMD_HELP.update({
-    "memes": ".cowsay\
+    "memes":
+    ".cowsay\
 \nUsage: cow which says things.\
 \n\n:/\
 \nUsage: Check yourself ;)\

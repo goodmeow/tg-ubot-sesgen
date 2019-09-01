@@ -15,8 +15,8 @@ from userbot.events import register, errors_handler
 @errors_handler
 async def useridgetter(target):
     """ For .userid command, returns the ID of the target user. """
-    if not target.text[0].isalpha() and target.text[0] not in (
-            "/", "#", "@", "!"):
+    if not target.text[0].isalpha() and target.text[0] not in ("/", "#", "@",
+                                                               "!"):
         message = await target.get_reply_message()
         if message:
             if not message.forward:
@@ -32,10 +32,8 @@ async def useridgetter(target):
                     name = "@" + message.forward.sender.username
                 else:
                     name = "*" + message.forward.sender.first_name + "*"
-            await target.edit(
-                "**Name:** {} \n**User ID:** `{}`"
-                .format(name, user_id)
-            )
+            await target.edit("**Name:** {} \n**User ID:** `{}`".format(
+                name, user_id))
 
 
 @register(outgoing=True, pattern="^.chatid$")
@@ -50,8 +48,8 @@ async def chatidgetter(chat):
 @errors_handler
 async def log(log_text):
     """ For .log command, forwards a message or the command argument to the bot logs group """
-    if not log_text.text[0].isalpha(
-    ) and log_text.text[0] not in ("/", "#", "@", "!"):
+    if not log_text.text[0].isalpha() and log_text.text[0] not in ("/", "#",
+                                                                   "@", "!"):
         if BOTLOG:
             if log_text.reply_to_msg_id:
                 reply_msg = await log_text.get_reply_message()
@@ -65,7 +63,8 @@ async def log(log_text):
                 return
             await log_text.edit("`Logged Successfully`")
         else:
-            await log_text.edit("`This feature requires Logging to be enabled!`")
+            await log_text.edit(
+                "`This feature requires Logging to be enabled!`")
         sleep(2)
         await log_text.delete()
 
@@ -74,8 +73,8 @@ async def log(log_text):
 @errors_handler
 async def kickme(leave):
     """ Basically it's .kickme command """
-    if not leave.text[0].isalpha() and leave.text[0] not in (
-            "/", "#", "@", "!"):
+    if not leave.text[0].isalpha() and leave.text[0] not in ("/", "#", "@",
+                                                             "!"):
         await leave.edit("`Nope, no, no, I go away`")
         sleep(2)
         await leave.delete()
@@ -86,8 +85,8 @@ async def kickme(leave):
 @errors_handler
 async def unmute_chat(unm_e):
     """ For .unmutechat command, unmute a muted chat. """
-    if not unm_e.text[0].isalpha() and unm_e.text[0] not in (
-            "/", "#", "@", "!"):
+    if not unm_e.text[0].isalpha() and unm_e.text[0] not in ("/", "#", "@",
+                                                             "!"):
         try:
             from userbot.modules.sql_helper.keep_read_sql import unkread
         except AttributeError:
@@ -103,8 +102,8 @@ async def unmute_chat(unm_e):
 @errors_handler
 async def mute_chat(mute_e):
     """ For .mutechat command, mute any chat. """
-    if not mute_e.text[0].isalpha() and mute_e.text[0] not in (
-            "/", "#", "@", "!"):
+    if not mute_e.text[0].isalpha() and mute_e.text[0] not in ("/", "#", "@",
+                                                               "!"):
         try:
             from userbot.modules.sql_helper.keep_read_sql import kread
         except AttributeError:
@@ -135,8 +134,10 @@ async def keep_read(message):
             if i.groupid == str(message.chat_id):
                 await message.client.send_read_acknowledge(message.chat_id)
 
+
 CMD_HELP.update({
-    "chat": ".chatid\
+    "chat":
+    ".chatid\
 \nUsage: Fetches the current chat's ID\
 \n\n.userid\
 \nUsage: Fetches the ID of the user in reply, if its a forwarded message, finds the ID for the source.\

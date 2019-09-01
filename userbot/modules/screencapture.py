@@ -32,15 +32,16 @@ async def capture(url):
             chrome_options.add_argument("--disable-dev-shm-usage")
             chrome_options.add_argument("--no-sandbox")
             chrome_options.add_argument('--disable-gpu')
-            driver = webdriver.Chrome(
-                executable_path=CHROME_DRIVER,
-                options=chrome_options)
+            driver = webdriver.Chrome(executable_path=CHROME_DRIVER,
+                                      options=chrome_options)
             input_str = url.pattern_match.group(1)
             driver.get(input_str)
             height = driver.execute_script(
-                "return Math.max(document.body.scrollHeight, document.body.offsetHeight, document.documentElement.clientHeight, document.documentElement.scrollHeight, document.documentElement.offsetHeight);")
+                "return Math.max(document.body.scrollHeight, document.body.offsetHeight, document.documentElement.clientHeight, document.documentElement.scrollHeight, document.documentElement.offsetHeight);"
+            )
             width = driver.execute_script(
-                "return Math.max(document.body.scrollWidth, document.body.offsetWidth, document.documentElement.clientWidth, document.documentElement.scrollWidth, document.documentElement.offsetWidth);")
+                "return Math.max(document.body.scrollWidth, document.body.offsetWidth, document.documentElement.clientWidth, document.documentElement.scrollWidth, document.documentElement.offsetWidth);"
+            )
             driver.set_window_size(width + 125, height + 125)
             await url.edit("`Generating screenshot of the page...`")
             await sleep(5)
@@ -53,18 +54,18 @@ async def capture(url):
             with io.BytesIO(im_png) as out_file:
                 out_file.name = "screencapture.png"
                 await url.edit("`Uploading screenshot as file..`")
-                await url.client.send_file(
-                    url.chat_id,
-                    out_file,
-                    caption=input_str,
-                    force_document=True,
-                    reply_to=message_id
-                )
+                await url.client.send_file(url.chat_id,
+                                           out_file,
+                                           caption=input_str,
+                                           force_document=True,
+                                           reply_to=message_id)
 
         except Exception:
             await url.edit(traceback.format_exc())
 
+
 CMD_HELP.update({
-    "screencapture": ".screencapture <url>\
+    "screencapture":
+    ".screencapture <url>\
     \nUsage: Takes a screenshot of a website and sends the screenshot."
 })

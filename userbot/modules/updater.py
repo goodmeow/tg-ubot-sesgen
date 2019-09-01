@@ -37,8 +37,7 @@ async def is_off_br(br):
 @errors_handler
 async def upstream(ups):
     "For .update command, check if the bot is up to date, update if specified"
-    if not ups.text[0].isalpha() and ups.text[0] not in (
-            "/", "#", "@", "!"):
+    if not ups.text[0].isalpha() and ups.text[0] not in ("/", "#", "@", "!"):
         await ups.edit("`Checking for updates, please wait....`")
         conf = ups.pattern_match.group(1)
         off_repo = 'https://github.com/AvinashReddy3108/PaperplaneExtended.git'
@@ -50,7 +49,9 @@ async def upstream(ups):
             await ups.edit(f'{txt}\n`directory {error} is not found`')
             return
         except InvalidGitRepositoryError as error:
-            await ups.edit(f'{txt}\n`directory {error} does not seems to be a git repository`')
+            await ups.edit(
+                f'{txt}\n`directory {error} does not seems to be a git repository`'
+            )
             return
         except GitCommandError as error:
             await ups.edit(f'{txt}\n`Early failure! {error}`')
@@ -61,8 +62,7 @@ async def upstream(ups):
             await ups.edit(
                 f'**[UPDATER]:**` Looks like you are using your own custom branch ({ac_br}). \
                 in that case, Updater is unable to identify which branch is to be merged. \
-                please checkout to any official branch`'
-            )
+                please checkout to any official branch`')
             return
 
         try:
@@ -75,7 +75,8 @@ async def upstream(ups):
         changelog = await gen_chlog(repo, f'HEAD..upstream/{ac_br}')
 
         if not changelog:
-            await ups.edit(f'\n`Your BOT is` **up-to-date** `with` **{ac_br}**\n')
+            await ups.edit(
+                f'\n`Your BOT is` **up-to-date** `with` **{ac_br}**\n')
             return
 
         if conf != "now":
@@ -93,16 +94,15 @@ async def upstream(ups):
                 remove("output.txt")
             else:
                 await ups.edit(changelog_str)
-            await ups.respond("`do \".update now\" to update\nDon't if using Heroku`")
+            await ups.respond(
+                "`do \".update now\" to update\nDon't if using Heroku`")
             return
 
         await ups.edit('`New update found, updating...`')
         ups_rem.fetch(ac_br)
         ups_rem.git.reset('--hard', 'FETCH_HEAD')
-        await ups.edit(
-            '`Successfully Updated!\n'
-            'Bot is restarting... Wait for a second!`'
-        )
+        await ups.edit('`Successfully Updated!\n'
+                       'Bot is restarting... Wait for a second!`')
         await ups.client.disconnect()
         # Spin a new instance of bot
         execl(sys.executable, sys.executable, *sys.argv)
@@ -111,7 +111,8 @@ async def upstream(ups):
 
 
 CMD_HELP.update({
-    'update': ".update\
+    'update':
+    ".update\
 \nUsage: Checks if the main userbot repository has any updates and shows a changelog if so.\
 \n\n.update now\
 \nUsage: Updates your userbot, if there are any updates in the main userbot repository."

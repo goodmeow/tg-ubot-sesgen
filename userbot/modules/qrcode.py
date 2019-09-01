@@ -5,7 +5,6 @@
 #
 # The entire source code is OSSRPL except 'makeqr and getqr' which is MPL
 # License: MPL and OSSRPL
-
 """ Userbot module containing commands related to QR Codes. """
 
 import os
@@ -27,13 +26,10 @@ async def parseqr(qr_e):
     """ For .decode command, get QR Code/BarCode content from the replied photo. """
     if not qr_e.text[0].isalpha() and qr_e.text[0] not in ("/", "#", "@", "!"):
         downloaded_file_name = await qr_e.client.download_media(
-            await qr_e.get_reply_message()
-        )
+            await qr_e.get_reply_message())
         # parse the Official ZXing webpage to decode the QRCode
         command_to_exec = [
-            "curl",
-            "-X", "POST",
-            "-F", "f=@" + downloaded_file_name + "",
+            "curl", "-X", "POST", "-F", "f=@" + downloaded_file_name + "",
             "https://zxing.org/w/decode"
         ]
         process = await asyncio.create_subprocess_exec(
@@ -61,8 +57,8 @@ async def parseqr(qr_e):
 @errors_handler
 async def barcode(event):
     """ For .barcode command, genrate a barcode containing the given content. """
-    if not event.text[0].isalpha() and event.text[0] not in (
-            "/", "#", "@", "!"):
+    if not event.text[0].isalpha() and event.text[0] not in ("/", "#", "@",
+                                                             "!"):
         await event.edit("`Processing..`")
         input_str = event.pattern_match.group(1)
         message = "SYNTAX: `.barcode <long text to include>`"
@@ -74,8 +70,7 @@ async def barcode(event):
             reply_msg_id = previous_message.id
             if previous_message.media:
                 downloaded_file_name = await event.client.download_media(
-                    previous_message
-                )
+                    previous_message)
                 m_list = None
                 with open(downloaded_file_name, "rb") as fd:
                     m_list = fd.readlines()
@@ -91,14 +86,13 @@ async def barcode(event):
 
         bar_code_type = "code128"
         try:
-            bar_code_mode_f = barcode.get(
-                bar_code_type, message, writer=ImageWriter())
+            bar_code_mode_f = barcode.get(bar_code_type,
+                                          message,
+                                          writer=ImageWriter())
             filename = bar_code_mode_f.save(bar_code_type)
-            await event.client.send_file(
-                event.chat_id,
-                filename,
-                reply_to=reply_msg_id
-            )
+            await event.client.send_file(event.chat_id,
+                                         filename,
+                                         reply_to=reply_msg_id)
             os.remove(filename)
         except Exception as e:
             await event.edit(str(e))
@@ -110,8 +104,8 @@ async def barcode(event):
 @errors_handler
 async def make_qr(makeqr):
     """ For .makeqr command, make a QR Code containing the given content. """
-    if not makeqr.text[0].isalpha() and makeqr.text[0] not in (
-            "/", "#", "@", "!"):
+    if not makeqr.text[0].isalpha() and makeqr.text[0] not in ("/", "#", "@",
+                                                               "!"):
         if makeqr.fwd_from:
             return
         input_str = makeqr.pattern_match.group(1)
@@ -124,8 +118,7 @@ async def make_qr(makeqr):
             reply_msg_id = previous_message.id
             if previous_message.media:
                 downloaded_file_name = await makeqr.client.download_media(
-                    previous_message
-                )
+                    previous_message)
                 m_list = None
                 with open(downloaded_file_name, "rb") as file:
                     m_list = file.readlines()
@@ -146,28 +139,29 @@ async def make_qr(makeqr):
         qr.make(fit=True)
         img = qr.make_image(fill_color="black", back_color="white")
         img.save("img_file.webp", "PNG")
-        await makeqr.client.send_file(
-            makeqr.chat_id,
-            "img_file.webp",
-            reply_to=reply_msg_id
-        )
+        await makeqr.client.send_file(makeqr.chat_id,
+                                      "img_file.webp",
+                                      reply_to=reply_msg_id)
         os.remove("img_file.webp")
         await makeqr.delete()
 
 
 CMD_HELP.update({
-    'decode': ".decode <reply to barcode/qrcode>\
+    'decode':
+    ".decode <reply to barcode/qrcode>\
 \nUsage: Get the content from the replied QR Code/Bar Code."
 })
 
 CMD_HELP.update({
-    'makeqr': ".makeqr <content>\
+    'makeqr':
+    ".makeqr <content>\
 \nUsage: Make a QR Code from the given content.\
 \nExample: .makeqr www.google.com"
 })
 
 CMD_HELP.update({
-    'barcode': ".barcode <content>\
+    'barcode':
+    ".barcode <content>\
 \nUsage: Make a BarCode from the given content.\
 \nExample: .barcode www.google.com"
 })

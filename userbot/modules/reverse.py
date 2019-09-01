@@ -5,7 +5,6 @@
 # Licensed under the Raphielscape Public License, Version 1.c (the "License");
 # you may not use this file except in compliance with the License.
 #
-
 """ Userbot module for reverse searching stickers and images on Google """
 
 import io
@@ -20,7 +19,6 @@ from PIL import Image
 
 from userbot import bot, CMD_HELP
 from userbot.events import register, errors_handler
-
 
 opener = urllib.request.build_opener()
 useragent = 'Mozilla/5.0 (Linux; Android 9; SM-G960F Build/PPR1.180610.011; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/74.0.3729.157 Mobile Safari/537.36'
@@ -57,30 +55,31 @@ async def okgoogle(img):
             # https://stackoverflow.com/questions/23270175/google-reverse-image-search-using-post-request#28792943
             searchUrl = 'https://www.google.com/searchbyimage/upload'
             multipart = {
-                'encoded_image': (
-                    name,
-                    open(
-                        name,
-                        'rb')),
-                'image_content': ''}
-            response = requests.post(
-                searchUrl, files=multipart, allow_redirects=False)
+                'encoded_image': (name, open(name, 'rb')),
+                'image_content': ''
+            }
+            response = requests.post(searchUrl,
+                                     files=multipart,
+                                     allow_redirects=False)
             fetchUrl = response.headers['Location']
 
             if response != 400:
-                await img.edit("`Image successfully uploaded to Google. Maybe.`"
-                               "\n`Parsing source now. Maybe.`")
+                await img.edit(
+                    "`Image successfully uploaded to Google. Maybe.`"
+                    "\n`Parsing source now. Maybe.`")
             else:
                 await img.edit("`Google told me to fuck off.`")
                 return
 
             os.remove(name)
-            match = await ParseSauce(fetchUrl + "&preferences?hl=en&fg=1#languages")
+            match = await ParseSauce(fetchUrl +
+                                     "&preferences?hl=en&fg=1#languages")
             guess = match['best_guess']
             imgspage = match['similar_images']
 
             if guess and imgspage:
-                await img.edit(f"[{guess}]({fetchUrl})\n\n`Looking for images...`")
+                await img.edit(
+                    f"[{guess}]({fetchUrl})\n\n`Looking for images...`")
             else:
                 await img.edit("`Couldn't find anything for your uglyass.`")
                 return
@@ -95,12 +94,15 @@ async def okgoogle(img):
                 k = requests.get(i)
                 yeet.append(k.content)
             try:
-                await img.client.send_file(entity=await img.client.get_input_entity(img.chat_id),
-                                           file=yeet,
-                                           reply_to=img)
+                await img.client.send_file(
+                    entity=await img.client.get_input_entity(img.chat_id),
+                    file=yeet,
+                    reply_to=img)
             except TypeError:
                 pass
-            await img.edit(f"[{guess}]({fetchUrl})\n\n[Visually similar images]({imgspage})")
+            await img.edit(
+                f"[{guess}]({fetchUrl})\n\n[Visually similar images]({imgspage})"
+            )
 
 
 async def ParseSauce(googleurl):
@@ -109,10 +111,7 @@ async def ParseSauce(googleurl):
     source = opener.open(googleurl).read()
     soup = BeautifulSoup(source, 'html.parser')
 
-    results = {
-        'similar_images': '',
-        'best_guess': ''
-    }
+    results = {'similar_images': '', 'best_guess': ''}
 
     try:
         for similar_image in soup.findAll('input', {'class': 'gLFyf'}):
@@ -148,7 +147,9 @@ async def scam(results, lim):
 
     return imglinks
 
+
 CMD_HELP.update({
-    'reverse': '.reverse\
+    'reverse':
+    '.reverse\
         \nUsage: Reply to a pic/sticker to search it on Google Images !!'
 })

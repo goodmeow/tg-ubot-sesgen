@@ -13,12 +13,11 @@ class Welcome(BASE):
     media_file_id = Column(UnicodeText)
     previous_welcome = Column(BigInteger)
 
-    def __init__(
-            self,
-            chat_id,
-            custom_welcome_message,
-            previous_welcome,
-            media_file_id=None):
+    def __init__(self,
+                 chat_id,
+                 custom_welcome_message,
+                 previous_welcome,
+                 media_file_id=None):
         self.chat_id = str(chat_id)
         self.custom_welcome_message = custom_welcome_message
         self.media_file_id = media_file_id
@@ -38,17 +37,13 @@ def get_current_welcome_settings(chat_id):
         SESSION.close()
 
 
-def add_welcome_setting(
-        chat_id,
-        custom_welcome_message,
-        previous_welcome,
-        media_file_id=None):
+def add_welcome_setting(chat_id,
+                        custom_welcome_message,
+                        previous_welcome,
+                        media_file_id=None):
     try:
-        adder = Welcome(
-            chat_id,
-            custom_welcome_message,
-            previous_welcome,
-            media_file_id)
+        adder = Welcome(chat_id, custom_welcome_message, previous_welcome,
+                        media_file_id)
         SESSION.add(adder)
         SESSION.commit()
         return True

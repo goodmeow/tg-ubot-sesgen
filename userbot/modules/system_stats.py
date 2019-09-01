@@ -15,7 +15,6 @@ from telethon import version
 from userbot import CMD_HELP, ALIVE_NAME
 from userbot.events import register, errors_handler
 
-
 # ================= CONSTANT =================
 DEFAULTUSER = str(ALIVE_NAME) if ALIVE_NAME else uname().node
 # ============================================
@@ -47,8 +46,8 @@ async def sysdetails(sysd):
 @errors_handler
 async def bot_ver(event):
     """ For .botver command, get the bot version. """
-    if not event.text[0].isalpha() and event.text[0] not in (
-            "/", "#", "@", "!"):
+    if not event.text[0].isalpha() and event.text[0] not in ("/", "#", "@",
+                                                             "!"):
         if which("git") is not None:
             invokever = "git describe --all --long"
             ver = await asyncrunapp(
@@ -70,14 +69,12 @@ async def bot_ver(event):
             revout = str(stdout.decode().strip()) \
                 + str(stderr.decode().strip())
 
-            await event.edit(
-                "`Userbot Version: "
-                f"{verout}"
-                "` \n"
-                "`Revision: "
-                f"{revout}"
-                "`"
-            )
+            await event.edit("`Userbot Version: "
+                             f"{verout}"
+                             "` \n"
+                             "`Revision: "
+                             f"{revout}"
+                             "`")
         else:
             await event.edit(
                 "Shame that you don't have git, You're running 4.0 - 'Extended' anyway"
@@ -116,19 +113,15 @@ async def pipcheck(pip):
                     )
                     remove("output.txt")
                     return
-                await pip.edit(
-                    "**Query: **\n`"
-                    f"{invokepip}"
-                    "`\n**Result: **\n`"
-                    f"{pipout}"
-                    "`"
-                )
+                await pip.edit("**Query: **\n`"
+                               f"{invokepip}"
+                               "`\n**Result: **\n`"
+                               f"{pipout}"
+                               "`")
             else:
-                await pip.edit(
-                    "**Query: **\n`"
-                    f"{invokepip}"
-                    "`\n**Result: **\n`No Result Returned/False`"
-                )
+                await pip.edit("**Query: **\n`"
+                               f"{invokepip}"
+                               "`\n**Result: **\n`No Result Returned/False`")
         else:
             await pip.edit("`Use .help pip to see an example`")
 
@@ -137,24 +130,22 @@ async def pipcheck(pip):
 @errors_handler
 async def amireallyalive(alive):
     """ For .alive command, check if the bot is running.  """
-    if not alive.text[0].isalpha() and alive.text[0] not in (
-            "/", "#", "@", "!"):
-        await alive.edit(
-            "`"
-            "My bot is running \n\n"
-            f"Telethon version: {version.__version__} \n"
-            f"Python: {python_version()} \n"
-            f"User: {DEFAULTUSER}"
-            "`"
-        )
+    if not alive.text[0].isalpha() and alive.text[0] not in ("/", "#", "@",
+                                                             "!"):
+        await alive.edit("`"
+                         "My bot is running \n\n"
+                         f"Telethon version: {version.__version__} \n"
+                         f"Python: {python_version()} \n"
+                         f"User: {DEFAULTUSER}"
+                         "`")
 
 
 @register(outgoing=True, pattern="^.aliveu")
 @errors_handler
 async def amireallyaliveuser(username):
     """ For .aliveu command, change the username in the .alive command. """
-    if not username.text[0].isalpha(
-    ) and username.text[0] not in ("/", "#", "@", "!"):
+    if not username.text[0].isalpha() and username.text[0] not in ("/", "#",
+                                                                   "@", "!"):
         message = username.text
         output = '.aliveu [new user without brackets] nor can it be empty'
         if not (message == '.aliveu' or message[7:8] != ' '):
@@ -162,41 +153,31 @@ async def amireallyaliveuser(username):
             global DEFAULTUSER
             DEFAULTUSER = newuser
             output = 'Successfully changed user to ' + newuser + '!'
-        await username.edit(
-            "`"
-            f"{output}"
-            "`"
-        )
+        await username.edit("`" f"{output}" "`")
 
 
 @register(outgoing=True, pattern="^.resetalive$")
 @errors_handler
 async def amireallyalivereset(ureset):
     """ For .resetalive command, reset the username in the .alive command. """
-    if not ureset.text[0].isalpha() and ureset.text[0] not in (
-            "/", "#", "@", "!"):
+    if not ureset.text[0].isalpha() and ureset.text[0] not in ("/", "#", "@",
+                                                               "!"):
         global DEFAULTUSER
         DEFAULTUSER = str(ALIVE_NAME) if ALIVE_NAME else uname().node
-        await ureset.edit(
-            "`"
-            "Successfully reset user for alive!"
-            "`"
-        )
+        await ureset.edit("`" "Successfully reset user for alive!" "`")
 
+
+CMD_HELP.update(
+    {"sysd": ".sysd\
+    \nUsage: Shows system information using neofetch."})
+CMD_HELP.update({"botver": ".botver\
+    \nUsage: Shows the userbot version."})
+CMD_HELP.update(
+    {"pip": ".pip <module(s)>\
+    \nUsage: Does a search of pip modules(s)."})
 CMD_HELP.update({
-    "sysd": ".sysd\
-    \nUsage: Shows system information using neofetch."
-})
-CMD_HELP.update({
-    "botver": ".botver\
-    \nUsage: Shows the userbot version."
-})
-CMD_HELP.update({
-    "pip": ".pip <module(s)>\
-    \nUsage: Does a search of pip modules(s)."
-})
-CMD_HELP.update({
-    "alive": ".alive\
+    "alive":
+    ".alive\
     \nUsage: Type .alive to see wether your bot is working or not.\
     \n\n.aliveu <text>\
     \nUsage: Changes the 'user' in alive to the text you want.\
