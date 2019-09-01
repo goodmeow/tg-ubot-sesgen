@@ -1,4 +1,3 @@
-from telethon.tl.functions.channels import EditBannedRequest
 from telethon.tl.functions.messages import EditChatDefaultBannedRightsRequest
 from telethon.tl.types import ChatBannedRights
 
@@ -13,6 +12,9 @@ async def locks(event):
     if not event.text[0].isalpha() and event.text[0] not in ("/", "#", "@",
                                                              "!"):
         input_str = event.pattern_match.group(1)
+        if not input_str:
+            await event.edit("`I can't lock nothing in this chat !!`")
+            return
         peer_id = event.chat_id
         msg = None
         media = None
@@ -24,37 +26,37 @@ async def locks(event):
         adduser = None
         cpin = None
         changeinfo = None
-        if input_str is "msg":
+        if input_str == "msg":
             msg = True
             what = "messages"
-        if input_str is "media":
+        if input_str.lower() == "media":
             media = True
             what = "media"
-        if input_str is "sticker":
+        if input_str.lower() == "sticker":
             sticker = True
             what = "stickers"
-        if input_str is "gif":
+        if input_str.lower() == "gif":
             gif = True
             what = "GIFs"
-        if input_str is "game":
+        if input_str.lower() == "game":
             gamee = True
             what = "games"
-        if input_str is "inline":
+        if input_str.lower() == "inline":
             ainline = True
             what = "inline bots"
-        if input_str is "poll":
+        if input_str.lower() == "poll":
             gpoll = True
             what = "polls"
-        if input_str is "invite":
+        if input_str.lower() == "invite":
             adduser = True
             what = "invites"
-        if input_str is "pin":
+        if input_str.lower() == "pin":
             cpin = True
             what = "pins"
-        if input_str is "info":
+        if input_str.lower() == "info":
             changeinfo = True
             what = "chat info"
-        if input_str is "all":
+        if input_str.lower() == "all":
             msg = True
             media = True
             sticker = True
@@ -66,7 +68,10 @@ async def locks(event):
             cpin = True
             changeinfo = True
             what = "everything"
-
+        else:
+            await event.edit(f"`Invalid lock type:` {input_str}")
+            return
+        
         lock_rights = ChatBannedRights(
             until_date=None,
             send_messages=msg,
@@ -87,8 +92,9 @@ async def locks(event):
             await event.edit(f"`Locked {what} for this chat !!`")
             await sleep(3)
             await event.delete()
-        except BaseException:
-            await event.edit("`Do I have proper rights for that ??`")
+        except BaseException as e:
+            await event.edit(f"`Do I have proper rights for that ??`\n**Error:** {str(e)}")
+            return
 
 
 @register(outgoing=True, pattern=r"^.unlock ?(.*)")
@@ -97,6 +103,9 @@ async def rem_locks(event):
     if not event.text[0].isalpha() and event.text[0] not in ("/", "#", "@",
                                                              "!"):
         input_str = event.pattern_match.group(1)
+        if not input_str:
+            await event.edit("`I can't unlock nothing in this chat !!`")
+            return
         peer_id = event.chat_id
         msg = None
         media = None
@@ -108,37 +117,37 @@ async def rem_locks(event):
         adduser = None
         cpin = None
         changeinfo = None
-        if input_str is "msg":
+        if input_str.lower() == "msg":
             msg = False
             what = "messages"
-        if input_str is "media":
+        if input_str.lower() == "media":
             media = False
             what = "media"
-        if input_str is "sticker":
+        if input_str.lower() == "sticker":
             sticker = False
             what = "stickers"
-        if input_str is "gif":
+        if input_str.lower() == "gif":
             gif = False
             what = "GIFs"
-        if input_str is "game":
+        if input_str.lower() == "game":
             gamee = False
             what = "games"
-        if input_str is "inline":
+        if input_str.lower() == "inline":
             ainline = False
             what = "inline bots"
-        if input_str is "poll":
+        if input_str.lower() == "poll":
             gpoll = False
             what = "polls"
-        if input_str is "invite":
+        if input_str.lower() == "invite":
             adduser = False
             what = "invites"
-        if input_str is "pin":
+        if input_str.lower() == "pin":
             cpin = False
             what = "pins"
-        if input_str is "info":
+        if input_str.lower() == "info":
             changeinfo = False
             what = "chat info"
-        if input_str is "all":
+        if input_str.lower() == "all":
             msg = False
             media = False
             sticker = False
@@ -150,7 +159,10 @@ async def rem_locks(event):
             cpin = False
             changeinfo = False
             what = "everything"
-
+        else:
+            await event.edit(f"`Invalid unlock type:` {input_str}")
+            return
+        
         unlock_rights = ChatBannedRights(
             until_date=None,
             send_messages=msg,
@@ -172,8 +184,9 @@ async def rem_locks(event):
             await event.edit(f"`Unlocked {what} for this chat !!`")
             await sleep(3)
             await event.delete()
-        except BaseException:
-            await event.edit("`Do I have proper rights for that ??`")
+        except BaseException as e:
+            await event.edit(f"`Do I have proper rights for that ??`\n**Error:** {str(e)}")
+            return
 
 
 CMD_HELP.update({
@@ -182,6 +195,5 @@ CMD_HELP.update({
 \nUsage: Allows you to lock/unlock some common message types in the chat.\
 [NOTE: Requires proper admin rights in the chat !!]\
 \n\nAvailable message types to lock/unlock are: \
-\n`all, msg, media, sticker, gif, game, inline, poll, invite, pin, info`\
-"
+\n`all, msg, media, sticker, gif, game, inline, poll, invite, pin, info`"
 })
