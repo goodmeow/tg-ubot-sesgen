@@ -387,6 +387,58 @@ RUNSREACTS = [
     "Running a marathon...there's an app for that.",
 ]
 
+RUNREACTS = [
+    "Where do you think you're going?",
+    "Huh? what? did they get away?",
+    "ZZzzZZzz... Huh? what? oh, just them again, nevermind.",
+    "Get back here!",
+    "Not so fast...",
+    "Look out for the wall!",
+    "Don't leave me alone with them!!",
+    "You run, you die.",
+    "Jokes on you, I'm everywhere",
+    "You're gonna regret that...",
+    "You could also try /kickme, I hear that's fun.",
+    "Go bother someone else, no-one here cares.",
+    "You can run, but you can't hide.",
+    "Is that all you've got?",
+    "I'm behind you...",
+    "You've got company!",
+    "We can do this the easy way, or the hard way.",
+    "You just don't get it, do you?",
+    "Yeah, you better run!",
+    "Please, remind me how much I care?",
+    "I'd run faster if I were you.",
+    "That's definitely the droid we're looking for.",
+    "May the odds be ever in your favour.",
+    "Famous last words.",
+    "And they disappeared forever, never to be seen again.",
+    "\"Oh, look at me! I'm so cool, I can run from a bot!\" - this person",
+    "Yeah yeah, just tap /kickme already.",
+    "Here, take this ring and head to Mordor while you're at it.",
+    "Legend has it, they're still running...",
+    "Unlike Harry Potter, your parents can't protect you from me.",
+    "Fear leads to anger. Anger leads to hate. Hate leads to suffering. If you keep running in fear, you might "
+    "be the next Vader.",
+    "Multiple calculations later, I have decided my interest in your shenanigans is exactly 0.",
+    "Legend has it, they're still running.",
+    "Keep it up, not sure we want you here anyway.",
+    "You're a wiza- Oh. Wait. You're not Harry, keep moving.",
+    "NO RUNNING IN THE HALLWAYS!",
+    "Hasta la vista, baby.",
+    "Who let the dogs out?",
+    "It's funny, because no one cares.",
+    "Ah, what a waste. I liked that one.",
+    "Frankly, my dear, I don't give a damn.",
+    "My milkshake brings all the boys to yard... So run faster!",
+    "You can't HANDLE the truth!",
+    "A long time ago, in a galaxy far far away... Someone would've cared about that. Not anymore though.",
+    "Hey, look at them! They're running from the inevitable banhammer... Cute.",
+    "Han shot first. So will I.",
+    "What are you running after, a white rabbit?",
+    "As The Doctor would say... RUN!",
+]
+
 HELLOSTR = [
     "Hi !",
     "‘Ello, gov'nor!",
@@ -466,7 +518,7 @@ CRI = [
     "(இ﹏இ`｡)",
     "༼ಢ_ಢ༽",
     "༼ ༎ຶ ෴ ༎ຶ༽",
-]
+] 
 
 SLAP_TEMPLATES = [
     "{hits} {victim} with a {item}.",
@@ -474,19 +526,33 @@ SLAP_TEMPLATES = [
     "{hits} {victim} around a bit with a {item}.",
     "{throws} a {item} at {victim}.",
     "grabs a {item} and {throws} it at {victim}'s face.",
+    "{hits} a {item} at {victim}.",
+    "{throws} a few {item} at {victim}.",
+    "grabs a {item} and {throws} it in {victim}'s face.",
     "launches a {item} in {victim}'s general direction.",
+    "sits on {victim}'s face while slamming a {item} into their crotch.",
     "starts slapping {victim} silly with a {item}.",
     "pins {victim} down and repeatedly {hits} them with a {item}.",
     "grabs up a {item} and {hits} {victim} with it.",
+    "starts slapping {victim} silly with a {item}.",
+    "holds {victim} down and repeatedly {hits} them with a {item}.",
+    "prods {victim} with a {item}.",
+    "picks up a {item} and {hits} {victim} with it.",
     "ties {victim} to a chair and {throws} a {item} at them.",
+    "{hits} {victim} {where} with a {item}.",
+    "ties {victim} to a pole and whips them with a {item}."
     "gave a friendly push to help {victim} learn to swim in lava.",
-    "sent {victim} to /dev/null.", "sent {victim} down the memory hole.",
-    "beheaded {victim}.", "threw {victim} off a building.",
+    "sent {victim} to /dev/null.",
+    "sent {victim} down the memory hole.",
+    "beheaded {victim}.",
+    "threw {victim} off a building.",
     "replaced all of {victim}'s music with Nickelback.",
-    "spammed {victim}'s email.", "made {victim} a knuckle sandwich.",
+    "spammed {victim}'s email.",
+    "made {victim} a knuckle sandwich.",
     "slapped {victim} with pure nothing.",
     "hit {victim} with a small, interstellar spaceship.",
-    "quickscoped {victim}.", "put {victim} in check-mate.",
+    "quickscoped {victim}.",
+    "put {victim} in check-mate.",
     "RSA-encrypted {victim} and deleted the private key.",
     "put {victim} in the friendzone.",
     "slaps {victim} with a DMCA takedown request!"
@@ -501,11 +567,15 @@ ITEMS = [
     "nail",
     "printer",
     "shovel",
+    "pair of trousers",
     "CRT monitor",
+    "diamond sword",
+    "baguette",
     "physics textbook",
     "toaster",
     "portrait of Richard Stallman",
     "television",
+    "mau5head",
     "five ton truck",
     "roll of duct tape",
     "book",
@@ -513,8 +583,11 @@ ITEMS = [
     "old television",
     "sack of rocks",
     "rainbow trout",
+    "cobblestone block",
+    "lava bucket",
     "rubber chicken",
     "spiked bat",
+    "gold block",
     "fire extinguisher",
     "heavy rock",
     "chunk of dirt",
@@ -537,6 +610,12 @@ HIT = [
     "slaps",
     "smacks",
     "bashes",
+]
+
+WHERE = [
+      "in the chest",
+      "on the head",
+      "on the bum",
 ]
 
 # ===========================================
@@ -682,9 +761,10 @@ async def slap(replied_user, event):
     item = random.choice(ITEMS)
     hit = random.choice(HIT)
     throw = random.choice(THROW)
-
+    where = random.choice(WHERE)
+    
     caption = "..." + temp.format(
-        victim=slapped, item=item, hits=hit, throws=throw)
+        victim=slapped, item=item, hits=hit, throws=throw, where=where)
 
     return caption
 
@@ -936,13 +1016,20 @@ async def shrugger(shg):
         await shg.edit(random.choice(SHGS))
 
 
-@register(outgoing=True, pattern="^.runs$")
+@register(outgoing=True, pattern="^.lmr$")
 @errors_handler
 async def runner_lol(run):
     """ Run, run, RUNNN! """
     if not run.text[0].isalpha() and run.text[0] not in ("/", "#", "@", "!"):
         await run.edit(random.choice(RUNSREACTS))
 
+
+@register(outgoing=True, pattern="^.run$")
+@errors_handler
+async def runner_lol(run):
+    """ Run, run, RUNNN! """
+    if not run.text[0].isalpha() and run.text[0] not in ("/", "#", "@", "!"):
+        await run.edit(random.choice(RUNREACTS))
 
 @register(outgoing=True, pattern="^.metoo$")
 @errors_handler
@@ -1201,8 +1288,10 @@ CMD_HELP.update({
 \nUsage: y u du dis, i cri.\
 \n\n.shg\
 \nUsage: Shrug at it !!\
-\n\n.runs\
-\nUsage: Run, run, RUNNN!\
+\n\n.lmr\
+\nUsage: Let Me Run, run, RUNNN!\
+\n\n.run\
+\nUsage: You better start running\
 \n\n.metoo\
 \nUsage: Haha yes\
 \n\n.mock\
