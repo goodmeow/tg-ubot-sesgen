@@ -365,7 +365,7 @@ FACEREACTS = [
     "(｡◕‿◕｡)",
 ]
 
-RUNSREACTS = [
+RUNS = [
     "Runs to Thanos..",
     "Runs far, far away from earth..",
     "Running faster than Bolt coz i'mma userbot !!",
@@ -387,7 +387,7 @@ RUNSREACTS = [
     "Running a marathon...there's an app for that.",
 ]
 
-CHASE_STR = [
+CHASES = [
     "Where do you think you're going?",
     "Huh? what? did they get away?",
     "ZZzzZZzz... Huh? what? oh, just them again, nevermind.",
@@ -1021,7 +1021,7 @@ async def shrugger(shg):
 async def police(chase):
     """ Run boy, RUN. I'm going to catch you !! """
     if not chase.text[0].isalpha() and chase.text[0] not in ("/", "#", "@", "!"):
-        await chase.edit(random.choice(CHASE_STR))
+        await chase.edit(random.choice(CHASES))
 
 
 @register(outgoing=True, pattern="^.run$")
@@ -1029,7 +1029,7 @@ async def police(chase):
 async def runner_lol(run):
     """ Run, run, RUNNN! """
     if not run.text[0].isalpha() and run.text[0] not in ("/", "#", "@", "!"):
-        await run.edit(random.choice(RUNREACTS))
+        await run.edit(random.choice(RUNS))
 
 @register(outgoing=True, pattern="^.metoo$")
 @errors_handler
