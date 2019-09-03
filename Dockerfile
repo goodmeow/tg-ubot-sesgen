@@ -1,12 +1,14 @@
-# We're using Alpine stable
+# We're using Alpine Edge
 FROM alpine:edge
 
 #
 # We have to uncomment Community repo for some packages
 #
-RUN sed -e 's;^#http\(.*\)/v3.9/community;http\1/v3.9/community;g' -i /etc/apk/repositories
+RUN sed -e 's;^#http\(.*\)/edge/community;http\1/edge/community;g' -i /etc/apk/repositories
 
-# Installing Python
+#
+# Installing Packages
+#
 RUN apk add --no-cache --update \
     bash \
     build-base \
@@ -56,36 +58,27 @@ RUN apk add --no-cache --update \
     sudo \
     zlib-dev
 
-# Copy Python Requirements to /app
-
-RUN  sed -e 's;^# \(%wheel.*NOPASSWD.*\);\1;g' -i /etc/sudoers
-RUN adduser userbot --disabled-password --home /home/userbot
-RUN adduser userbot wheel
-USER userbot
-RUN mkdir /home/userbot/userbot
-RUN mkdir /home/userbot/bin
-RUN git clone https://github.com/AvinashReddy3108/PaperplaneExtended /home/userbot/userbot
-WORKDIR /home/userbot/userbot
-ADD ./requirements.txt /home/userbot/userbot/requirements.txt
+#
+# Clone repo and prepare working directory
+#
+RUN mkdir /root/userbot/bin
+RUN git clone -b sql-extended https://github.com/AvinashReddy3108/PaperplaneExtended /root/userbot
+WORKDIR /root/userbot/
 
 #
-# Copies session and config(if it exists)
+# Copies session and config (if it exists)
 #
 COPY ./sample_config.env ./userbot.session* ./config.env* /home/userbot/userbot/
 
 #
 # Clone helper scripts
 #
-RUN curl -s https://raw.githubusercontent.com/yshalsager/megadown/master/megadown -o /home/userbot/bin/megadown && sudo chmod a+x /home/userbot/bin/megadown
-RUN curl -s https://raw.githubusercontent.com/yshalsager/cmrudl.py/master/cmrudl.py -o /home/userbot/bin/cmrudl && sudo chmod a+x /home/userbot/bin/cmrudl
-ENV PATH="/home/userbot/bin:$PATH"
+RUN curl -s https://raw.githubusercontent.com/yshalsager/megadown/master/megadown -o /root/userbot/bin/megadown && sudo chmod a+x /root/userbot/bin/megadown
+RUN curl -s https://raw.githubusercontent.com/yshalsager/cmrudl.py/master/cmrudl.py -o /root/userbot/bin/cmrudl && sudo chmod a+x /root/userbot/bin/cmrudl
+ENV PATH="/root/userbot/bin:$PATH"
 
 #
 # Install requirements
 #
-RUN sudo pip3 install -r requirements.txt
-ADD . /home/userbot/userbot
-RUN sudo chown -R $(whoami) /usr/lib/python3.7/site-packages
-RUN sudo chown -R userbot /home/userbot/userbot
-RUN sudo chmod -R 777 /home/userbot/userbot
+RUN pip3 install -r requirements.txt
 CMD ["python3","-m","userbot"]
