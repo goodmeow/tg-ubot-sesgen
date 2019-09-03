@@ -365,7 +365,7 @@ FACEREACTS = [
     "(｡◕‿◕｡)",
 ]
 
-RUNS = [
+RUNSREACTS = [
     "Runs to Thanos..",
     "Runs far, far away from earth..",
     "Running faster than Bolt coz i'mma userbot !!",
@@ -387,7 +387,7 @@ RUNS = [
     "Running a marathon...there's an app for that.",
 ]
 
-CHASES = [
+RUNREACTS = [
     "Where do you think you're going?",
     "Huh? what? did they get away?",
     "ZZzzZZzz... Huh? what? oh, just them again, nevermind.",
@@ -1016,12 +1016,12 @@ async def shrugger(shg):
         await shg.edit(random.choice(SHGS))
 
 
-@register(outgoing=True, pattern="^.chase$")
+@register(outgoing=True, pattern="^.lmr$")
 @errors_handler
-async def police(chase):
-    """ Run boy, RUN. I'm going to catch you !! """
-    if not chase.text[0].isalpha() and chase.text[0] not in ("/", "#", "@", "!"):
-        await chase.edit(random.choice(CHASES))
+async def runner_lol(run):
+    """ Run, run, RUNNN! """
+    if not run.text[0].isalpha() and run.text[0] not in ("/", "#", "@", "!"):
+        await run.edit(random.choice(RUNSREACTS))
 
 
 @register(outgoing=True, pattern="^.run$")
@@ -1029,7 +1029,7 @@ async def police(chase):
 async def runner_lol(run):
     """ Run, run, RUNNN! """
     if not run.text[0].isalpha() and run.text[0] not in ("/", "#", "@", "!"):
-        await run.edit(random.choice(RUNS))
+        await run.edit(random.choice(RUNREACTS))
 
 @register(outgoing=True, pattern="^.metoo$")
 @errors_handler
@@ -1288,9 +1288,9 @@ CMD_HELP.update({
 \nUsage: y u du dis, i cri.\
 \n\n.shg\
 \nUsage: Shrug at it !!\
-\n\n.run\
+\n\n.lmr\
 \nUsage: Let Me Run, run, RUNNN!\
-\n\n.chase\
+\n\n.run\
 \nUsage: You better start running\
 \n\n.metoo\
 \nUsage: Haha yes\
