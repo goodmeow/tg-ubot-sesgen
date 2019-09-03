@@ -61,8 +61,8 @@ RUN apk add --no-cache --update \
 #
 # Clone repo and prepare working directory
 #
-RUN mkdir /root/userbot/bin
 RUN git clone -b sql-extended https://github.com/AvinashReddy3108/PaperplaneExtended /root/userbot
+RUN mkdir /root/userbot/bin
 WORKDIR /root/userbot/
 
 #
