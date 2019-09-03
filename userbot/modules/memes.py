@@ -387,7 +387,7 @@ RUNSREACTS = [
     "Running a marathon...there's an app for that.",
 ]
 
-RUNREACTS = [
+CHASE_STR = [
     "Where do you think you're going?",
     "Huh? what? did they get away?",
     "ZZzzZZzz... Huh? what? oh, just them again, nevermind.",
@@ -1016,12 +1016,12 @@ async def shrugger(shg):
         await shg.edit(random.choice(SHGS))
 
 
-@register(outgoing=True, pattern="^.lmr$")
+@register(outgoing=True, pattern="^.chase$")
 @errors_handler
-async def runner_lol(run):
-    """ Run, run, RUNNN! """
-    if not run.text[0].isalpha() and run.text[0] not in ("/", "#", "@", "!"):
-        await run.edit(random.choice(RUNSREACTS))
+async def police(chase):
+    """ Run boy, RUN. I'm going to catch you !! """
+    if not chase.text[0].isalpha() and chase.text[0] not in ("/", "#", "@", "!"):
+        await chase.edit(random.choice(CHASE_STR))
 
 
 @register(outgoing=True, pattern="^.run$")
@@ -1288,9 +1288,9 @@ CMD_HELP.update({
 \nUsage: y u du dis, i cri.\
 \n\n.shg\
 \nUsage: Shrug at it !!\
-\n\n.lmr\
-\nUsage: Let Me Run, run, RUNNN!\
 \n\n.run\
+\nUsage: Let Me Run, run, RUNNN!\
+\n\n.chase\
 \nUsage: You better start running\
 \n\n.metoo\
 \nUsage: Haha yes\
