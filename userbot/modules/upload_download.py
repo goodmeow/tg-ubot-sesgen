@@ -134,6 +134,7 @@ async def download(target_file):
                     \n{progress_str}\
                     \n{humanbytes(downloaded)} of {humanbytes(total_length)}\
                     \nETA: {estimated_total_time}"
+
                     if current_message != display_message:
                         await target_file.edit(current_message)
                         display_message = current_message

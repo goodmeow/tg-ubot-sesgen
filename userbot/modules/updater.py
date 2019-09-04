@@ -20,8 +20,9 @@ from userbot.events import register, errors_handler
 # ================= CONSTANT =================
 off_repo = 'https://github.com/AvinashReddy3108/PaperplaneExtended.git'
 off_br = ['sql-extended', 'sql-dirty']
-# ===========================================
 
+
+# ===========================================
 async def gen_chlog(repo, diff):
     ch_log = ''
     d_form = "%d/%m/%y"
@@ -35,25 +36,27 @@ async def is_off_br(br):
         return True
     return
 
+
 # Kanged from : https://github.com/AyraHikari/Nana-TgBot/blob/master/nana/modules/updater.py
 async def initial_git(repo):
-	isexist = os.path.exists('userbot-old')
-	if isexist:
-		rmtree('userbot-old')
-	mkdir('userbot-old')
-	rename('userbot', 'userbot-old/userbot')
-	rename('.gitignore', 'userbot-old/.gitignore')
-	rename('LICENSE', 'userbot-old/LICENSE')
-	rename('README.md', 'userbot-old/README.md')
-	rename('requirements.txt', 'userbot-old/requirements.txt')
-	rename('Procfile', 'userbot-old/Procfile')
-	rename('runtime.txt', 'userbot-old/runtime.txt')
-	rename('config.env', 'userbot-old/config.env')
-	rename('userbot.session', 'userbot-old/userbot.session')
-	update = repo.create_remote('sql-extended', off_repo)
-	update.pull('sql-extended')
-	rename('userbot-old/userbot.session', 'userbot.session')
-	rename('userbot-old/config.env', 'config.env')
+    isexist = os.path.exists('userbot-old')
+    if isexist:
+        rmtree('userbot-old')
+    mkdir('userbot-old')
+    rename('userbot', 'userbot-old/userbot')
+    rename('.gitignore', 'userbot-old/.gitignore')
+    rename('LICENSE', 'userbot-old/LICENSE')
+    rename('README.md', 'userbot-old/README.md')
+    rename('requirements.txt', 'userbot-old/requirements.txt')
+    rename('Procfile', 'userbot-old/Procfile')
+    rename('runtime.txt', 'userbot-old/runtime.txt')
+    rename('config.env', 'userbot-old/config.env')
+    rename('userbot.session', 'userbot-old/userbot.session')
+    update = repo.create_remote('sql-extended', off_repo)
+    update.pull('sql-extended')
+    rename('userbot-old/userbot.session', 'userbot.session')
+    rename('userbot-old/config.env', 'config.env')
+
 
 @register(outgoing=True, pattern="^.update(?: |$)(.*)")
 @errors_handler
@@ -62,9 +65,9 @@ async def upstream(ups):
     if not ups.text[0].isalpha() and ups.text[0] not in ("/", "#", "@", "!"):
         await ups.edit("`Checking for updates, please wait....`")
         initial = False
-	
+
         conf = ups.pattern_match.group(1)
-	
+
         try:
             txt = "`Oops.. Updater cannot continue due to some problems occured`\n\n**LOGTRACE:**\n"
             repo = Repo()
@@ -77,20 +80,27 @@ async def upstream(ups):
         except GitCommandError as error:
             await ups.edit(f'{txt}\n`{error}`')
             return
-        
+
         if initial:
             if len(ups.text.split()) != 2:
-                await ups.edit('Your git workdir is missing!\nBut i can repair and take new latest update for you.\nJust do `update now` to repair and take update!')
+                await ups.edit(
+                    'Your git workdir is missing!\nBut i can repair and take new latest update for you.\nJust do `update now` to repair and take update!'
+                )
                 return
             elif len(ups.text.split()) == 2 and ups.text.split()[1] == "now":
                 try:
                     await initial_git(repo)
                 except Exception as err:
                     exc_type, exc_obj, exc_tb = sys.exc_info()
-                    await ups.edit('An error has accured!\nPlease see your Assistant for more information!')
+                    await ups.edit(
+                        'An error has accured!\nPlease see your Assistant for more information!'
+                    )
                     sys.__excepthook__(exc_type, exc_obj, exc_tb)
-                    errors = traceback.format_exception(etype=exc_type, value=exc_obj, tb=exc_tb)
-                    text = "An error has accured!\n\n```{}```\n".format("".join(errors))
+                    errors = traceback.format_exception(etype=exc_type,
+                                                        value=exc_obj,
+                                                        tb=exc_tb)
+                    text = "An error has accured!\n\n```{}```\n".format(
+                        "".join(errors))
                     if errtype == ModuleNotFoundError:
                         text += "\nHint: Try this in your terminal `pip install -r requirements.txt`"
                     if BOTLOG:
@@ -125,10 +135,15 @@ async def upstream(ups):
                     await initial_git(repo)
                 except Exception as err:
                     exc_type, exc_obj, exc_tb = sys.exc_info()
-                    await ups.edit('An error has accured!\nPlease see your Assistant for more information!')
+                    await ups.edit(
+                        'An error has accured!\nPlease see your Assistant for more information!'
+                    )
                     sys.__excepthook__(exc_type, exc_obj, exc_tb)
-                    errors = traceback.format_exception(etype=exc_type, value=exc_obj, tb=exc_tb)
-                    text = "An error has accured!\n\n```{}```\n".format("".join(errors))
+                    errors = traceback.format_exception(etype=exc_type,
+                                                        value=exc_obj,
+                                                        tb=exc_tb)
+                    text = "An error has accured!\n\n```{}```\n".format(
+                        "".join(errors))
                     if errtype == ModuleNotFoundError:
                         text += "\nHint: Try this in your terminal `pip install -r requirements.txt`"
                     if BOTLOG:

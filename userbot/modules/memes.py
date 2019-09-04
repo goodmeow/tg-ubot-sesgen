@@ -518,7 +518,7 @@ CRI = [
     "(இ﹏இ`｡)",
     "༼ಢ_ಢ༽",
     "༼ ༎ຶ ෴ ༎ຶ༽",
-] 
+]
 
 SLAP_TEMPLATES = [
     "{hits} {victim} with a {item}.",
@@ -526,8 +526,7 @@ SLAP_TEMPLATES = [
     "{hits} {victim} around a bit with a {item}.",
     "{throws} a {item} at {victim}.",
     "grabs a {item} and {throws} it at {victim}'s face.",
-    "{hits} a {item} at {victim}.",
-    "{throws} a few {item} at {victim}.",
+    "{hits} a {item} at {victim}.", "{throws} a few {item} at {victim}.",
     "grabs a {item} and {throws} it in {victim}'s face.",
     "launches a {item} in {victim}'s general direction.",
     "sits on {victim}'s face while slamming a {item} into their crotch.",
@@ -542,17 +541,13 @@ SLAP_TEMPLATES = [
     "{hits} {victim} {where} with a {item}.",
     "ties {victim} to a pole and whips them with a {item}."
     "gave a friendly push to help {victim} learn to swim in lava.",
-    "sent {victim} to /dev/null.",
-    "sent {victim} down the memory hole.",
-    "beheaded {victim}.",
-    "threw {victim} off a building.",
+    "sent {victim} to /dev/null.", "sent {victim} down the memory hole.",
+    "beheaded {victim}.", "threw {victim} off a building.",
     "replaced all of {victim}'s music with Nickelback.",
-    "spammed {victim}'s email.",
-    "made {victim} a knuckle sandwich.",
+    "spammed {victim}'s email.", "made {victim} a knuckle sandwich.",
     "slapped {victim} with pure nothing.",
     "hit {victim} with a small, interstellar spaceship.",
-    "quickscoped {victim}.",
-    "put {victim} in check-mate.",
+    "quickscoped {victim}.", "put {victim} in check-mate.",
     "RSA-encrypted {victim} and deleted the private key.",
     "put {victim} in the friendzone.",
     "slaps {victim} with a DMCA takedown request!"
@@ -613,9 +608,9 @@ HIT = [
 ]
 
 WHERE = [
-      "in the chest",
-      "on the head",
-      "on the bum",
+    "in the chest",
+    "on the head",
+    "on the bum",
 ]
 
 # ===========================================
@@ -762,7 +757,7 @@ async def slap(replied_user, event):
     hit = random.choice(HIT)
     throw = random.choice(THROW)
     where = random.choice(WHERE)
-    
+
     caption = "..." + temp.format(
         victim=slapped, item=item, hits=hit, throws=throw, where=where)
 
@@ -1020,7 +1015,8 @@ async def shrugger(shg):
 @errors_handler
 async def police(chase):
     """ Run boi run, i'm gonna catch you !! """
-    if not chase.text[0].isalpha() and chase.text[0] not in ("/", "#", "@", "!"):
+    if not chase.text[0].isalpha() and chase.text[0] not in ("/", "#", "@",
+                                                             "!"):
         await chase.edit(random.choice(CHASE_STR))
 
 
@@ -1030,6 +1026,7 @@ async def runner_lol(run):
     """ Run, run, RUNNN! """
     if not run.text[0].isalpha() and run.text[0] not in ("/", "#", "@", "!"):
         await run.edit(random.choice(RUNS_STR))
+
 
 @register(outgoing=True, pattern="^.metoo$")
 @errors_handler
