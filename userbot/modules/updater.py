@@ -98,11 +98,17 @@ async def upstream(ups):
             return
 
         await ups.edit('`New update found, updating...`')
-        ups_rem.fetch(ac_br)
-        ups_rem.git.reset('--hard')
-        repo.git.clean('-fd', 'userbot/modules/')
-        await ups.edit('`Successfully Updated!\n'
-                       'Bot is restarting... Wait for a second!`')
+        try:
+            ups_rem.fetch(ac_br)
+            ups_rem.pull(ac_br)
+            await ups.edit('`Successfully Updated!\n'
+                           'Bot is restarting... Wait for a second!`')
+        except GitCommandError:
+            repo.git.reset('--hard')
+            repo.git.clean('-fd', 'userbot/modules/')
+            await ups.edit('`Successfully Updated!\n'
+                           'Bot is restarting... Wait for a second!`')
+
         await ups.client.disconnect()
         # Spin a new instance of bot
         execl(sys.executable, sys.executable, *sys.argv)
