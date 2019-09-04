@@ -781,18 +781,22 @@ async def decide(event):
                                                              "!"):
         if event.fwd_from:
             return
-        message = event.pattern_match.group(1)
+        decision = event.pattern_match.group(1).lower()
         message_id = None
         if event.reply_to_msg_id:
             message_id = event.reply_to_msg_id
-        if not message:
+        if not decision:
             r = requests.get("https://yesno.wtf/api").json()
         else:
             try:
+                options = ["yes", "no", "maybe"]
+                if decision not in options:
+                    await event.edit("`Available decisions:` *yes*, *no*, *maybe*")
+                    return
                 r = requests.get(
-                    f"https://yesno.wtf/api?force={message.lower()}").json()
-            except BaseException:
-                await event.edit("`Available decisions:` *yes*, *no*, *maybe*")
+                    f"https://yesno.wtf/api?force={decision}").json()
+            except Excepption as err:
+                await event.edit(f"`Error:` {str(err)}")
                 return
         await event.client.send_message(event.chat_id,
                                         str(r["answer"]).upper(),
