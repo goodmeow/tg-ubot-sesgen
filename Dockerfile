@@ -61,7 +61,7 @@ RUN apk add --no-cache --update \
 #
 # Clone repo and prepare working directory
 #
-RUN git clone https://github.com/AvinashReddy3108/PaperplaneExtended /root/userbot
+RUN git clone -b sql-dirty https://github.com/AvinashReddy3108/PaperplaneExtended /root/userbot
 RUN mkdir /root/userbot/bin
 WORKDIR /root/userbot/
 
