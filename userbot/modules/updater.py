@@ -17,6 +17,10 @@ from git.exc import GitCommandError, InvalidGitRepositoryError, NoSuchPathError
 from userbot import CMD_HELP, BOTLOG, BOTLOG_CHATID
 from userbot.events import register, errors_handler
 
+# ================= CONSTANT =================
+off_repo = 'https://github.com/AvinashReddy3108/PaperplaneExtended.git'
+off_br = ['sql-extended', 'sql-dirty']
+# ===========================================
 
 async def gen_chlog(repo, diff):
     ch_log = ''
@@ -27,7 +31,6 @@ async def gen_chlog(repo, diff):
 
 
 async def is_off_br(br):
-    off_br = ['sql-extended', 'sql-dirty']
     if br in off_br:
         return True
     return
@@ -38,19 +41,19 @@ async def initial_git(repo):
 	if isexist:
 		rmtree('userbot-old')
 	mkdir('userbot-old')
-    rename('userbot', 'userbot-old/userbot')
-    rename('.gitignore', 'userbot-old/.gitignore')
-    rename('LICENSE', 'userbot-old/LICENSE')
-    rename('README.md', 'userbot-old/README.md')
-    rename('requirements.txt', 'userbot-old/requirements.txt')
-    rename('Procfile', 'userbot-old/Procfile')
-    rename('runtime.txt', 'userbot-old/runtime.txt')
-    rename('config.env', 'userbot-old/config.env')
-    rename('userbot.session', 'userbot-old/userbot.session')
-    update = repo.create_remote('sql-extended', off_repo)
-    update.pull('sql-extended')
-    rename('userbot-old/userbot.session', 'userbot.session')
-    rename('userbot-old/config.env', 'config.env')
+	rename('userbot', 'userbot-old/userbot')
+	rename('.gitignore', 'userbot-old/.gitignore')
+	rename('LICENSE', 'userbot-old/LICENSE')
+	rename('README.md', 'userbot-old/README.md')
+	rename('requirements.txt', 'userbot-old/requirements.txt')
+	rename('Procfile', 'userbot-old/Procfile')
+	rename('runtime.txt', 'userbot-old/runtime.txt')
+	rename('config.env', 'userbot-old/config.env')
+	rename('userbot.session', 'userbot-old/userbot.session')
+	update = repo.create_remote('sql-extended', off_repo)
+	update.pull('sql-extended')
+	rename('userbot-old/userbot.session', 'userbot.session')
+	rename('userbot-old/config.env', 'config.env')
 
 @register(outgoing=True, pattern="^.update(?: |$)(.*)")
 @errors_handler
@@ -59,9 +62,9 @@ async def upstream(ups):
     if not ups.text[0].isalpha() and ups.text[0] not in ("/", "#", "@", "!"):
         await ups.edit("`Checking for updates, please wait....`")
         initial = False
+	
         conf = ups.pattern_match.group(1)
-        off_repo = 'https://github.com/AvinashReddy3108/PaperplaneExtended.git'
-
+	
         try:
             txt = "`Oops.. Updater cannot continue due to some problems occured`\n\n**LOGTRACE:**\n"
             repo = Repo()
@@ -99,6 +102,7 @@ async def upstream(ups):
                 exit()
 
         ac_br = repo.active_branch.name
+
         if not await is_off_br(ac_br):
             await ups.edit(
                 f'**[UPDATER]:**` Looks like you are using your own custom branch ({ac_br}). \
