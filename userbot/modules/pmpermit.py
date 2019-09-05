@@ -121,8 +121,7 @@ async def auto_accept(event):
             async for message in event.client.iter_messages(event.chat_id,
                                                             reverse=True,
                                                             limit=1):
-                if message.message is not UNAPPROVED_MSG and message.from_id == (
-                        await event.client.get_me()).id:
+                if message.message is not UNAPPROVED_MSG and message.from_id == self_user.id:
                     try:
                         approve(event.chat_id)
                     except IntegrityError:
