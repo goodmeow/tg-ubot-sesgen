@@ -641,8 +641,8 @@ async def download_video(v_url):
                         await v_url.edit(final_str)
                         msg = final_str
                         sleep(1)
-                    except Exception:
-                        pass
+                except Exception:
+                    pass
 
         await v_url.edit(f"Saved to {dest_name} !!")
 
