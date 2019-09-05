@@ -606,7 +606,7 @@ async def download_video(v_url):
                 'outtmpl': '%(title)s.%(ext)s',
                 'quiet': True,
                 'logtostderr': False,
-                'progress_hooks': [rip_hook],
+                'progress_hooks': [await rip_hook],
             }
         elif type.lower() in ['mp4', 'flv', 'ogg', 'webm', 'mkv', 'avi']:
             opts = {
@@ -621,7 +621,7 @@ async def download_video(v_url):
                 'outtmpl': '%(title)s.%(ext)s',
                 'logtostderr': False,
                 'quiet': True,
-                'progress_hooks': [rip_hook],
+                'progress_hooks': [await rip_hook],
             }
         else:
             opts = {
@@ -633,7 +633,7 @@ async def download_video(v_url):
                 'outtmpl': '%(title)s.%(ext)s',
                 'logtostderr': False,
                 'quiet': True,
-                'progress_hooks': [rip_hook],
+                'progress_hooks': [await rip_hook],
             }
 
         await v_url.edit("**Downloading...**")
