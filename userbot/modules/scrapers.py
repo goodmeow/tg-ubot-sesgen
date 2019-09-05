@@ -565,25 +565,6 @@ async def download_video(v_url):
         url = v_url.pattern_match.group(1)
         type = v_url.pattern_match.group(2).lower()
 
-        def rip_hook(d):
-            if d['status'] == 'downloading':
-                downloading = True
-                filen = d['filename']
-                prcnt = d['_percent_str']
-                ttlbyt = d['_total_bytes_str']
-                spdstr = d['_speed_str']
-                etastr = d['_eta_str']
-
-                finalstr = f"Downloading...\
-                \nFile Name:{filen}\
-                \nProgress: {prcnt} of {ttlbyt}\
-                \nSpeed: {spdstr}\
-                \nETA: {etastr}"
-
-            if d['status'] == 'finished':
-                downloading = False
-                dest_name = d['filename']
-                
         await v_url.edit("**Fetching...**")
 
         if type.lower() in ['aac', 'flac', 'mp3', 'm4a', 'opus', 'vorbis', 'wav']:
@@ -600,8 +581,8 @@ async def download_video(v_url):
                 'outtmpl': '%(title)s.%(ext)s',
                 'quiet': True,
                 'logtostderr': False,
-                'progress_hooks': [rip_hook],
             }
+
         elif type.lower() in ['mp4', 'flv', 'ogg', 'webm', 'mkv', 'avi']:
             opts = {
                 'format': 'bestvideo+bestaudio',
@@ -615,8 +596,8 @@ async def download_video(v_url):
                 'outtmpl': '%(title)s.%(ext)s',
                 'logtostderr': False,
                 'quiet': True,
-                'progress_hooks': [rip_hook],
             }
+
         else:
             opts = {
                 'format': 'best',
@@ -632,19 +613,15 @@ async def download_video(v_url):
 
         await v_url.edit("**Downloading...**")
 
-        with youtube_dl.YoutubeDL(opts) as rip:
-            rip.download([url])
-            msg = None
-            while downloading:
-                try:
-                    if msg != final_str:
-                        await v_url.edit(final_str)
-                        msg = final_str
-                        sleep(1)
-                except Exception:
-                    pass
+        try:
+            with youtube_dl.YoutubeDL(opts) as rip:
+                rip.download([url])
+            await v_url.edit(f"Downloaded succesfully !!")
+        except Exception as err:
+            await v_url.edit(f"Error: {str(err)}")
+            return
 
-        await v_url.edit(f"Saved to {dest_name} !!")
+        
 
 
 def deEmojify(inputString):
@@ -697,5 +674,5 @@ CMD_HELP.update(
 CMD_HELP.update({
     'rip':
     '.rip <url>\
-        \nUsage: Download videos from YouTube (and many other sites.). If no quality is specified, the highest downloadable quality is downloaded.'
+        \nUsage: Download videos from YouTube (and many other sites). If no quality is specified, the highest downloadable quality is downloaded.'
 })
