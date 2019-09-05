@@ -565,9 +565,9 @@ async def download_video(v_url):
         url = v_url.pattern_match.group(1)
         type = v_url.pattern_match.group(2).lower()
 
-        async def rip_hook(d):
-            msg = None
+        def rip_hook(d):
             if d['status'] == 'downloading':
+                downloading = True
                 filen = d['filename']
                 prcnt = d['_percent_str']
                 ttlbyt = d['_total_bytes_str']
@@ -579,16 +579,10 @@ async def download_video(v_url):
                 \nProgress: {prcnt} of {ttlbyt}\
                 \nSpeed: {spdstr}\
                 \nETA: {etastr}"
-                try:
-                    if msg != final_str:
-                        await v_url.edit(final_str)
-                        msg = final_str
-                        sleep(1)
-                except Exception:
-                    pass
 
             if d['status'] == 'finished':
-                v_url.edit("Done downloading, now converting ...")
+                downloading = False
+                dest_name = d['filename']
                 
         await v_url.edit("**Fetching...**")
 
@@ -606,7 +600,7 @@ async def download_video(v_url):
                 'outtmpl': '%(title)s.%(ext)s',
                 'quiet': True,
                 'logtostderr': False,
-                'progress_hooks': [await rip_hook],
+                'progress_hooks': [rip_hook],
             }
         elif type.lower() in ['mp4', 'flv', 'ogg', 'webm', 'mkv', 'avi']:
             opts = {
@@ -621,7 +615,7 @@ async def download_video(v_url):
                 'outtmpl': '%(title)s.%(ext)s',
                 'logtostderr': False,
                 'quiet': True,
-                'progress_hooks': [await rip_hook],
+                'progress_hooks': [rip_hook],
             }
         else:
             opts = {
@@ -633,13 +627,24 @@ async def download_video(v_url):
                 'outtmpl': '%(title)s.%(ext)s',
                 'logtostderr': False,
                 'quiet': True,
-                'progress_hooks': [await rip_hook],
+                'progress_hooks': [rip_hook],
             }
 
         await v_url.edit("**Downloading...**")
 
         with youtube_dl.YoutubeDL(opts) as rip:
             rip.download([url])
+            msg = None
+            while downloading:
+                try:
+                    if msg != final_str:
+                        await v_url.edit(final_str)
+                        msg = final_str
+                        sleep(1)
+                    except Exception:
+                        pass
+
+        await v_url.edit(f"Saved to {dest_name} !!")
 
 
 def deEmojify(inputString):
