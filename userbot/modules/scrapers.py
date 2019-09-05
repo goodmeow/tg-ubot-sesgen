@@ -565,7 +565,7 @@ async def download_video(v_url):
         url = v_url.pattern_match.group(1)
         type = v_url.pattern_match.group(2).lower()
 
-        await v_url.edit("**Fetching...**")
+        await v_url.edit("**Preparing to download..**")
 
         if type.lower() in ['aac', 'flac', 'mp3', 'm4a', 'opus', 'vorbis', 'wav']:
             opts = {
@@ -580,7 +580,7 @@ async def download_video(v_url):
                 }],
                 'outtmpl': '%(title)s.%(ext)s',
                 'quiet': True,
-                'logtostderr': False,
+                'logtostderr': False
             }
 
         elif type.lower() in ['mp4', 'flv', 'ogg', 'webm', 'mkv', 'avi']:
@@ -591,11 +591,11 @@ async def download_video(v_url):
                 'nocheckcertificate': True,
                 'postprocessors': [{
                     'key': 'FFmpegVideoConvertor',
-                    'preferredcodec': type
+                    'preferedformat': type
                 }],
                 'outtmpl': '%(title)s.%(ext)s',
                 'logtostderr': False,
-                'quiet': True,
+                'quiet': True
             }
 
         else:
@@ -607,13 +607,11 @@ async def download_video(v_url):
                 'nocheckcertificate': True,
                 'outtmpl': '%(title)s.%(ext)s',
                 'logtostderr': False,
-                'quiet': True,
-                'progress_hooks': [rip_hook],
+                'quiet': True
             }
 
-        await v_url.edit("**Downloading...**")
-
         try:
+            await v_url.edit("**Downloading...**")
             with youtube_dl.YoutubeDL(opts) as rip:
                 rip.download([url])
             await v_url.edit(f"Downloaded succesfully !!")
