@@ -2,7 +2,7 @@
 <h3 align="center">A modular Telegram userbot running on Python 3.6+ with an sqlalchemy database.</h3>
 <h4 align="center">Based on RaphielGang's <a href="https://github.com/RaphielGang/Telegram-UserBot">Paperplane</a> Telegram userbot.</h4>
 <h4 align="center">A modular Telegram userbot running on Python 3.6+ with an sqlalchemy database.</h4>
-<p align="center"><a href="#how-to-use">How To Use</a> | <a href="#updates-and-suport">Updates and Support</a> | <a href="#credits">Credits</a> | <a href="#license">License</a></p>
+<p align="center"><a href="#how-to-use-">How To Use</a> | <a href="#updates-and-suport">Updates and Support</a> | <a href="#credits">Credits</a> | <a href="#license">License</a></p>
 <hr />
 <h2 align="center">How to use ?</h2>
 <h5 align="center">The easiest way to deploy this derpfest !!</h5>
