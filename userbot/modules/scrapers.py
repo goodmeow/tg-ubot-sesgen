@@ -565,7 +565,7 @@ async def download_video(v_url):
         url = v_url.pattern_match.group(1)
         type = v_url.pattern_match.group(2).lower()
 
-        def rip_hook(d):
+        async def rip_hook(d):
             msg = None
             if d['status'] == 'downloading':
                 filen = d['filename']
@@ -690,7 +690,7 @@ CMD_HELP.update({'yt': '.yt <text>\
 CMD_HELP.update(
     {"imdb": ".imdb <movie-name>\nShows movie info and other stuffs"})
 CMD_HELP.update({
-    'yt_dl':
-    '.yt_dl <url>\
-        \nUsage: Download videos from YouTube.If no quality is specified, the highest downloadable quality is downloaded.'
+    'rip':
+    '.rip <url>\
+        \nUsage: Download videos from YouTube (and many other sites.). If no quality is specified, the highest downloadable quality is downloaded.'
 })
