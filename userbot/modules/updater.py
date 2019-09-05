@@ -27,8 +27,9 @@ async def gen_chlog(repo, diff):
 
 async def is_off_br(br):
     off_br = ['sql-extended', 'sql-dirty']
-    if br in off_br:
-        return True
+    for k in off_br:
+        if k == br:
+            return 1
     return
 
 
@@ -98,17 +99,10 @@ async def upstream(ups):
             return
 
         await ups.edit('`New update found, updating...`')
-        try:
-            ups_rem.fetch(ac_br)
-            ups_rem.pull(ac_br)
-            await ups.edit('`Successfully Updated!\n'
-                           'Bot is restarting... Wait for a second!`')
-        except GitCommandError:
-            repo.git.reset('--hard')
-            repo.git.clean('-fd', 'userbot/modules/')
-            await ups.edit('`Successfully Updated!\n'
-                           'Bot is restarting... Wait for a second!`')
-
+        ups_rem.fetch(ac_br)
+        repo.git.reset('--hard', 'FETCH_HEAD')
+        await ups.edit('`Successfully Updated!\n'
+                       'Bot is restarting... Wait for a second!`')
         await ups.client.disconnect()
         # Spin a new instance of bot
         execl(sys.executable, sys.executable, *sys.argv)
