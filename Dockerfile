@@ -54,6 +54,7 @@ RUN apk add --no-cache --update \
     python3-dev \
     readline-dev \
     sqlite \
+    ffmpeg \
     sqlite-dev \
     sudo \
     zlib-dev
