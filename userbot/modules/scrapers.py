@@ -28,8 +28,8 @@ from googleapiclient.errors import HttpError
 from googletrans import LANGUAGES, Translator
 from gtts import gTTS
 from emoji import get_emoji_regexp
-from pytube import YouTube
-from pytube.helpers import safe_filename
+import youtube_dl
+from asyncio import sleep
 
 from userbot import CMD_HELP, BOTLOG, BOTLOG_CHATID, YOUTUBE_API_KEY, CHROME_DRIVER, GOOGLE_CHROME_BIN
 from userbot.events import register, errors_handler
@@ -553,78 +553,98 @@ def youtube_search(query,
         nexttok = "KeyError, try again."
         return (nexttok, videos)
 
-
-@register(outgoing=True, pattern=r".yt_dl (\S*) ?(\S*)")
+# Thanks to @kandnub for parts of this code.
+# Do check out his cool userbot at
+# https://github.com/kandnub/TG-UserBot
+@register(outgoing=True, pattern=r".rip (\S*) ?(\S*)")
 @errors_handler
 async def download_video(v_url):
-    """ For .yt_dl command, download videos from YouTube. """
+    """ For .rip command, download media from YouTube + 800 other sites. """
     if not v_url.text[0].isalpha() and v_url.text[0] not in ("/", "#", "@",
                                                              "!"):
         url = v_url.pattern_match.group(1)
-        quality = v_url.pattern_match.group(2)
+        type = v_url.pattern_match.group(2).lower()
 
+        def rip_hook(d):
+            msg = None
+            if d['status'] == 'downloading':
+                filen = d['filename']
+                prcnt = d['_percent_str']
+                ttlbyt = d['_total_bytes_str']
+                spdstr = d['_speed_str']
+                etastr = d['_eta_str']
+
+                finalstr = f"Downloading...\
+                \nFile Name:{filen}\
+                \nProgress: {prcnt} of {ttlbyt}\
+                \nSpeed: {spdstr}\
+                \nETA: {etastr}"
+                try:
+                    if msg != final_str:
+                        await v_url.edit(final_str)
+                        msg = final_str
+                        sleep(1)
+                except Exception:
+                    pass
+
+            if d['status'] == 'finished':
+                v_url.edit("Done downloading, now converting ...")
+                
         await v_url.edit("**Fetching...**")
 
-        video = YouTube(url)
-
-        if quality:
-            video_stream = video.streams.filter(progressive=True,
-                                                subtype="mp4",
-                                                res=quality).first()
+        if type.lower() in ['aac', 'flac', 'mp3', 'm4a', 'opus', 'vorbis', 'wav']:
+            opts = {
+                'format': 'bestaudio',
+                'prefer_ffmpeg': True,
+                'geo_bypass': True,
+                'nocheckcertificate': True,
+                'postprocessors': [{
+                    'key': 'FFmpegExtractAudio',
+                    'preferredcodec': type,
+                    'preferredquality': '320',
+                }],
+                'outtmpl': '%(title)s.%(ext)s',
+                'quiet': True,
+                'logtostderr': False,
+                'progress_hooks': [rip_hook],
+            }
+        elif type.lower() in ['mp4', 'flv', 'ogg', 'webm', 'mkv', 'avi']:
+            opts = {
+                'format': 'bestvideo+bestaudio',
+                'prefer_ffmpeg': True,
+                'geo_bypass': True,
+                'nocheckcertificate': True,
+                'postprocessors': [{
+                    'key': 'FFmpegVideoConvertor',
+                    'preferredcodec': type
+                }],
+                'outtmpl': '%(title)s.%(ext)s',
+                'logtostderr': False,
+                'quiet': True,
+                'progress_hooks': [rip_hook],
+            }
         else:
-            video_stream = video.streams.filter(progressive=True,
-                                                subtype="mp4").first()
-
-        if video_stream is None:
-            all_streams = video.streams.filter(progressive=True,
-                                               subtype="mp4").all()
-            available_qualities = ""
-
-            for item in all_streams[:-1]:
-                available_qualities += f"{item.resolution}, "
-            available_qualities += all_streams[-1].resolution
-
-            await v_url.edit(
-                "**A stream matching your query wasn't found. Try again with different options.\n**"
-                "**Available Qualities:**\n"
-                f"{available_qualities}")
-            return
-
-        video_size = video_stream.filesize / 1000000
-
-        if video_size >= 50:
-            await v_url.edit((
-                "**File larger than 50MB. Sending the link instead.\n**"
-                f"Get the video [here]({video_stream.url})\n\n"
-                "**If the video plays instead of downloading, right click(or long press on touchscreen) and "
-                "press 'Save Video As...'(may depend on the browser) to download the video.**"
-            ))
-            return
+            opts = {
+                'format': 'best',
+                'key': 'FFmpegMetadata',
+                'prefer_ffmpeg': True,
+                'geo_bypass': True,
+                'nocheckcertificate': True,
+                'outtmpl': '%(title)s.%(ext)s',
+                'logtostderr': False,
+                'quiet': True,
+                'progress_hooks': [rip_hook],
+            }
 
         await v_url.edit("**Downloading...**")
 
-        video_stream.download(filename=video.title)
-
-        url = f"https://img.youtube.com/vi/{video.video_id}/maxresdefault.jpg"
-        resp = get(url)
-        with open('thumbnail.jpg', 'wb') as file:
-            file.write(resp.content)
-
-        await v_url.edit("**Uploading...**")
-        await v_url.client.send_file(v_url.chat_id,
-                                     f'{safe_filename(video.title)}.mp4',
-                                     caption=f"{video.title}",
-                                     thumb="thumbnail.jpg")
-
-        os.remove(f"{safe_filename(video.title)}.mp4")
-        os.remove('thumbnail.jpg')
-        await v_url.delete()
+        with youtube_dl.YoutubeDL(opts) as rip:
+            rip.download([url])
 
 
 def deEmojify(inputString):
     """ Remove emojis and other non-safe characters from string """
     return get_emoji_regexp().sub(u'', inputString)
-
 
 CMD_HELP.update({
     'img':
@@ -671,6 +691,6 @@ CMD_HELP.update(
     {"imdb": ".imdb <movie-name>\nShows movie info and other stuffs"})
 CMD_HELP.update({
     'yt_dl':
-    '.yt_dl <url> <quality>\
-        \nUsage: Download videos from YouTube.If no quality is specified, the highest downloadable quality is downloaded. Will send the link if the video is larger than 50 MB.'
+    '.yt_dl <url>\
+        \nUsage: Download videos from YouTube.If no quality is specified, the highest downloadable quality is downloaded.'
 })
