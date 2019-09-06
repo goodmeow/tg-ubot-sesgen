@@ -16,6 +16,7 @@ RUN apk add --no-cache --update \
     curl \
     figlet \
     gcc \
+    g++ \
     git \
     sudo \
     util-linux \
@@ -32,20 +33,11 @@ RUN apk add --no-cache --update \
     musl \
     neofetch \
     openssl-dev \
-    php-pgsql \
     postgresql \
     postgresql-client \
     postgresql-dev \
-    py3-lxml \
-    py3-pillow \
     py3-pip \
     py3-setuptools \
-    py3-psycopg2 \
-    py3-requests \
-    py3-sqlalchemy \
-    py3-tz \
-    py3-aiohttp \
-    python-dev \
     openssl \
     pv \
     jq \
