@@ -22,7 +22,7 @@ async def tmeme(e):
         await e.delete()
         if BOTLOG:
             await e.client.send_message(
-                BOTLOG_CHATID, "#TSPAM \n\n"
+                BOTLOG_CHATID, "#TSPAM\n"
                 "TSpam was executed successfully")
 
 
@@ -36,7 +36,7 @@ async def spammer(e):
         await e.delete()
         if BOTLOG:
             await e.client.send_message(
-                BOTLOG_CHATID, "#SPAM \n\n"
+                BOTLOG_CHATID, "#SPAM\n"
                 "Spam was executed successfully")
 
 
@@ -53,7 +53,7 @@ async def tiny_pic_spam(e):
         await e.delete()
         if BOTLOG:
             await e.client.send_message(
-                BOTLOG_CHATID, "#PICSPAM \n\n"
+                BOTLOG_CHATID, "#PICSPAM\n"
                 "PicSpam was executed successfully")
 
 
@@ -70,7 +70,7 @@ async def spammer(e):
         await e.delete()
         if BOTLOG:
             await e.client.send_message(
-                BOTLOG_CHATID, "#DelaySPAM \n\n"
+                BOTLOG_CHATID, "#DelaySPAM\n"
                 "DelaySpam was executed successfully")
 
 
