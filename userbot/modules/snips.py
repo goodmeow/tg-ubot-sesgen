@@ -15,7 +15,7 @@ TYPE_PHOTO = 1
 TYPE_DOCUMENT = 2
 
 
-@register(outgoing=True, pattern=r"\$\(.*)", ignore_unsafe=True)
+@register(outgoing=True, pattern=r"\$\w*", ignore_unsafe=True)
 @errors_handler
 async def on_snip(event):
     """ Snips logic. """
