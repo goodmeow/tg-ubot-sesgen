@@ -19,6 +19,7 @@ RUN apk add --no-cache --update \
     g++ \
     git \
     sudo \
+    aria2c \
     util-linux \
     chromium \
     chromium-chromedriver \
