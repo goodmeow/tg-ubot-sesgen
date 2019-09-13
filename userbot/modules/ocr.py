@@ -39,25 +39,22 @@ async def ocr_space_file(filename,
 
 @register(pattern=r"\.ocr (.*)", outgoing=True)
 async def ocr(event):
-    if not event.text[0].isalpha() and event.text[0] not in ("/", "#", "@",
-                                                             "!"):
-        await event.edit("`Reading...`")
-        if not os.path.isdir(TEMP_DOWNLOAD_DIRECTORY):
-            os.makedirs(TEMP_DOWNLOAD_DIRECTORY)
-        lang_code = event.pattern_match.group(1)
-        downloaded_file_name = await bot.download_media(
-            await event.get_reply_message(), TEMP_DOWNLOAD_DIRECTORY)
-        test_file = await ocr_space_file(filename=downloaded_file_name,
-                                         language=lang_code)
-        try:
-            ParsedText = test_file["ParsedResults"][0]["ParsedText"]
-        except BaseException:
-            await event.edit(
-                "`Couldn't read it.`\n`I guess I need new glasses.`")
-        else:
-            await event.edit(
-                f"`Here's what I could read from it:`\n\n{ParsedText}")
-        os.remove(downloaded_file_name)
+    await event.edit("`Reading...`")
+    if not os.path.isdir(TEMP_DOWNLOAD_DIRECTORY):
+        os.makedirs(TEMP_DOWNLOAD_DIRECTORY)
+    lang_code = event.pattern_match.group(1)
+    downloaded_file_name = await bot.download_media(
+        await event.get_reply_message(), TEMP_DOWNLOAD_DIRECTORY)
+    test_file = await ocr_space_file(filename=downloaded_file_name,
+                                     language=lang_code)
+    try:
+        ParsedText = test_file["ParsedResults"][0]["ParsedText"]
+    except BaseException:
+        await event.edit("`Couldn't read it.`\n`I guess I need new glasses.`")
+    else:
+        await event.edit(f"`Here's what I could read from it:`\n\n{ParsedText}"
+                         )
+    os.remove(downloaded_file_name)
 
 
 CMD_HELP.update({

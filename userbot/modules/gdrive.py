@@ -27,9 +27,6 @@ from userbot.modules.upload_download import progress, humanbytes, time_formatter
 
 # Path to token json file, it should be in same directory as script
 G_DRIVE_TOKEN_FILE = "./auth_token.txt"
-# Copy your credentials from the APIs Console
-CLIENT_ID = G_DRIVE_CLIENT_ID
-CLIENT_SECRET = G_DRIVE_CLIENT_SECRET
 # Check https://developers.google.com/drive/scopes for all available scopes
 OAUTH_SCOPE = "https://www.googleapis.com/auth/drive.file"
 # Redirect URI for installed apps, can be left as is
@@ -42,99 +39,90 @@ parent_id = GDRIVE_FOLDER_ID
 @errors_handler
 async def download(dryb):
     """ For .gdrive command, upload files to google drive. """
-    if not dryb.text[0].isalpha() and dryb.text[0] not in ("/", "#", "@", "!"):
-        if dryb.fwd_from:
-            return
-        await dryb.edit("Processing ...")
-        input_str = dryb.pattern_match.group(1)
-        if CLIENT_ID is None or CLIENT_SECRET is None:
-            return
-        if not os.path.isdir(TEMP_DOWNLOAD_DIRECTORY):
-            os.makedirs(TEMP_DOWNLOAD_DIRECTORY)
-            required_file_name = None
-        if "|" in input_str:
-            url, file_name = input_str.split("|")
-            url = url.strip()
-            # https://stackoverflow.com/a/761825/4723940
-            file_name = file_name.strip()
-            head, tail = os.path.split(file_name)
-            if head:
-                if not os.path.isdir(
-                        os.path.join(TEMP_DOWNLOAD_DIRECTORY, head)):
-                    os.makedirs(os.path.join(TEMP_DOWNLOAD_DIRECTORY, head))
-                    file_name = os.path.join(head, tail)
-            downloaded_file_name = TEMP_DOWNLOAD_DIRECTORY + "" + file_name
-            downloader = SmartDL(url, downloaded_file_name, progress_bar=False)
-            downloader.start(blocking=False)
-            c_time = time.time()
-            display_message = None
-            while not downloader.isFinished():
-                status = downloader.get_status().capitalize()
-                total_length = downloader.filesize if downloader.filesize else None
-                downloaded = downloader.get_dl_size()
-                now = time.time()
-                diff = now - c_time
-                percentage = downloader.get_progress() * 100
-                speed = downloader.get_speed()
-                elapsed_time = round(diff) * 1000
-                progress_str = "[{0}{1}]\nProgress: {2}%".format(
-                    ''.join(["█" for i in range(math.floor(percentage / 5))]),
-                    ''.join(
-                        ["░" for i in range(20 - math.floor(percentage / 5))]),
-                    round(percentage, 2))
-                estimated_total_time = downloader.get_eta(human=True)
-                try:
-                    current_message = f"{status}...\
-                    \nURL: {url}\
-                    \nFile Name: {file_name}\
-                    \n{progress_str}\
-                    \n{humanbytes(downloaded)} of {humanbytes(total_length)}\
-                    \nETA: {estimated_total_time}"
-
-                    if current_message != display_message:
-                        await dryb.edit(current_message)
-                        display_message = current_message
-                        await asyncio.sleep(1)
-                except Exception as e:
-                    LOGS.info(str(e))
-                    pass
-            if downloader.isSuccessful():
-                await dryb.edit(
-                    "Downloaded to `{}` successfully !!\nInitiating upload to Google Drive.."
-                    .format(downloaded_file_name))
-                required_file_name = downloaded_file_name
-            else:
-                await dryb.edit("Incorrect URL\n{}".format(url))
-        elif input_str:
-            input_str = input_str.strip()
-            if os.path.exists(input_str):
-                required_file_name = input_str
-                await dryb.edit(
-                    "Found `{}` in local server, initiating upload to Google Drive.."
-                    .format(input_str))
-            else:
-                await dryb.edit(
-                    "File not found in local server. Give me a valid file path !"
-                )
-                return False
-        elif dryb.reply_to_msg_id:
+    await dryb.edit("Processing ...")
+    input_str = dryb.pattern_match.group(1)
+    if G_DRIVE_CLIENT_ID is None or G_DRIVE_CLIENT_SECRET is None:
+        return
+    if not os.path.isdir(TEMP_DOWNLOAD_DIRECTORY):
+        os.makedirs(TEMP_DOWNLOAD_DIRECTORY)
+    if "|" in input_str:
+        url, file_name = input_str.split("|")
+        url = url.strip()
+        # https://stackoverflow.com/a/761825/4723940
+        file_name = file_name.strip()
+        head, tail = os.path.split(file_name)
+        if head:
+            if not os.path.isdir(os.path.join(TEMP_DOWNLOAD_DIRECTORY, head)):
+                os.makedirs(os.path.join(TEMP_DOWNLOAD_DIRECTORY, head))
+                file_name = os.path.join(head, tail)
+        downloaded_file_name = TEMP_DOWNLOAD_DIRECTORY + "" + file_name
+        downloader = SmartDL(url, downloaded_file_name, progress_bar=False)
+        downloader.start(blocking=False)
+        c_time = time.time()
+        display_message = None
+        while not downloader.isFinished():
+            status = downloader.get_status().capitalize()
+            total_length = downloader.filesize if downloader.filesize else None
+            downloaded = downloader.get_dl_size()
+            now = time.time()
+            diff = now - c_time
+            percentage = downloader.get_progress() * 100
+            speed = downloader.get_speed()
+            elapsed_time = round(diff) * 1000
+            progress_str = "[{0}{1}]\nProgress: {2}%".format(
+                ''.join(["█" for i in range(math.floor(percentage / 5))]),
+                ''.join(["░" for i in range(20 - math.floor(percentage / 5))]),
+                round(percentage, 2))
+            estimated_total_time = downloader.get_eta(human=True)
             try:
-                c_time = time.time()
-                downloaded_file_name = await dryb.client.download_media(
-                    await dryb.get_reply_message(),
-                    TEMP_DOWNLOAD_DIRECTORY,
-                    progress_callback=lambda d, t: asyncio.get_event_loop().
-                    create_task(progress(d, t, dryb, c_time, "Downloading..."))
-                )
-            except Exception as e:  # pylint:disable=C0103,W0703
-                await dryb.edit(str(e))
-            else:
-                required_file_name = downloaded_file_name
-                await dryb.edit(
-                    "Downloaded to `{}` successfully !!\nInitiating upload to Google Drive.."
-                    .format(downloaded_file_name))
+                current_message = f"{status}...\
+                \nURL: {url}\
+                \nFile Name: {file_name}\
+                \n{progress_str}\
+                \n{humanbytes(downloaded)} of {humanbytes(total_length)}\
+                \nETA: {estimated_total_time}"
+
+                if round(diff %
+                         10.00) == 0 and current_message != display_message:
+                    await dryb.edit(current_message)
+                    display_message = current_message
+            except Exception as e:
+                LOGS.info(str(e))
+                pass
+        if downloader.isSuccessful():
+            await dryb.edit(
+                "Downloaded to `{}` successfully !!\nInitiating upload to Google Drive.."
+                .format(downloaded_file_name))
+            required_file_name = downloaded_file_name
+        else:
+            await dryb.edit("Incorrect URL\n{}".format(url))
+    elif input_str:
+        input_str = input_str.strip()
+        if os.path.exists(input_str):
+            required_file_name = input_str
+            await dryb.edit(
+                "Found `{}` in local server, initiating upload to Google Drive.."
+                .format(input_str))
+        else:
+            await dryb.edit(
+                "File not found in local server. Give me a valid file path !")
+            return False
+    elif dryb.reply_to_msg_id:
+        try:
+            c_time = time.time()
+            downloaded_file_name = await dryb.client.download_media(
+                await dryb.get_reply_message(),
+                TEMP_DOWNLOAD_DIRECTORY,
+                progress_callback=lambda d, t: asyncio.get_event_loop(
+                ).create_task(progress(d, t, dryb, c_time, "Downloading...")))
+        except Exception as e:  # pylint:disable=C0103,W0703
+            await dryb.edit(str(e))
+        else:
+            required_file_name = downloaded_file_name
+            await dryb.edit(
+                "Downloaded to `{}` successfully !!\nInitiating upload to Google Drive.."
+                .format(downloaded_file_name))
     if required_file_name:
-        #
         if G_DRIVE_AUTH_TOKEN_DATA is not None:
             with open(G_DRIVE_TOKEN_FILE, "w") as t_file:
                 t_file.write(G_DRIVE_AUTH_TOKEN_DATA)
@@ -142,22 +130,20 @@ async def download(dryb):
         # authorization code
         if not os.path.isfile(G_DRIVE_TOKEN_FILE):
             storage = await create_token_file(G_DRIVE_TOKEN_FILE, dryb)
-            http = authorize(G_DRIVE_TOKEN_FILE, storage)
+            http = await authorize(G_DRIVE_TOKEN_FILE, storage)
         # Authorize, get file parameters, upload file and print out result URL
         # for download
-        http = authorize(G_DRIVE_TOKEN_FILE, None)
-        file_name, mime_type = file_ops(required_file_name)
+        http = await authorize(G_DRIVE_TOKEN_FILE, None)
+        file_name, mime_type = await file_ops(required_file_name)
         # required_file_name will have the full path
         # Sometimes API fails to retrieve starting URI, we wrap it.
         try:
             g_drive_link = await upload_file(http, required_file_name,
                                              file_name, mime_type, dryb)
-            await dryb.edit(
-                f"File:`{required_file_name}`\nwas successfully uploaded to [Google Drive]({g_drive_link})!"
-            )
+            await dryb.edit(f"Successfully uploaded to Google Drive.\
+                \nHere's the [download link]({g_drive_link})")
         except Exception as e:
-            await dryb.edit(
-                f"Error while uploading to Google Drive\nError Code:\n`{e}`")
+            await dryb.edit(f"Error while uploading to Google Drive\n`{e}`")
 
 
 @register(
@@ -167,38 +153,31 @@ async def download(dryb):
 @errors_handler
 async def download(set):
     """For .gsetf command, allows you to set path"""
-    if not set.text[0].isalpha() and set.text[0] not in ("/", "#", "@", "!"):
-        if set.fwd_from:
-            return
-        await set.reply("Processing ...")
-        input_str = set.pattern_match.group(1)
-        if input_str:
-            parent_id = input_str
-            await set.edit(
-                "Custom Folder ID set successfully. The next uploads will upload to {parent_id} till `.gdriveclear`"
-            )
-            await set.delete()
-        else:
-            await set.edit(
-                "Use `.gdrivesp <link to GDrive Folder>` to set the folder to upload new files to."
-            )
+    await set.reply("Processing ...")
+    input_str = set.pattern_match.group(1)
+    if input_str:
+        parent_id = input_str
+        await set.edit("Custom Folder ID set successfully.\
+            \nThe next uploads will upload to {parent_id}\
+            \nUse `.gdriveclear` to reset to default folder.")
+        await set.delete()
+    else:
+        await set.edit("Use `.gdrivesp <link to GDrive Folder>`\
+            \nto set the folder ID to upload new files to.")
 
 
 @register(pattern="^.gsetclear$", outgoing=True)
 @errors_handler
 async def download(gclr):
     """For .gsetclear command, allows you clear ur curnt custom path"""
-    if not gclr.text[0].isalpha() and gclr.text[0] not in ("/", "#", "@", "!"):
-        if gclr.fwd_from:
-            return
-        await gclr.reply("Processing ...")
-        parent_id = GDRIVE_FOLDER_ID
-        await gclr.edit("Custom Folder ID cleared successfully.")
-        await gclr.delete()
+    await gclr.reply("Processing ...")
+    parent_id = GDRIVE_FOLDER_ID
+    await gclr.edit("Custom Folder ID cleared successfully.")
+    await gclr.delete()
 
 
 # Get mime type and name of given file
-def file_ops(file_path):
+async def file_ops(file_path):
     mime_type = guess_type(file_path)[0]
     mime_type = mime_type if mime_type else "text/plain"
     file_name = file_path.split("/")[-1]
@@ -207,8 +186,8 @@ def file_ops(file_path):
 
 async def create_token_file(token_file, event):
     # Run through the OAuth flow and retrieve credentials
-    flow = OAuth2WebServerFlow(CLIENT_ID,
-                               CLIENT_SECRET,
+    flow = OAuth2WebServerFlow(G_DRIVE_CLIENT_ID,
+                               G_DRIVE_CLIENT_SECRET,
                                OAUTH_SCOPE,
                                redirect_uri=REDIRECT_URI)
     authorize_url = flow.step1_get_authorize_url()
@@ -227,7 +206,7 @@ async def create_token_file(token_file, event):
         return storage
 
 
-def authorize(token_file, storage):
+async def authorize(token_file, storage):
     # Get credentials
     if storage is None:
         storage = Storage(token_file)
@@ -288,13 +267,16 @@ async def upload_file(http, file_path, file_name, mime_type, event):
 
 @register(pattern="^.gfolder$", outgoing=True)
 @errors_handler
-async def _(event):
-    if event.fwd_from:
-        return
-    folder_link = f"https://drive.google.com/drive/u/2/folders/" + parent_id
-    await event.edit(
-        f"Userbot is currently uploading files to [this Gdrive folder]({folder_link})"
-    )
+async def show_current_gdrove_folder(event):
+    if parent_id:
+        folder_link = f"https://drive.google.com/drive/folders/" + parent_id
+        await event.edit(
+            f"My userbot is currently uploading files [here]({folder_link})")
+    else:
+        await event.edit(
+            f"My userbot is currently uploading files to the root of my Google Drive storage.\
+            \nFind uploaded files [here](https://drive.google.com/drive/my-drive)"
+        )
 
 
 CMD_HELP.update({

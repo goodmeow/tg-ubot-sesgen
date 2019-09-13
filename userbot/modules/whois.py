@@ -20,42 +20,38 @@ from userbot.events import register, errors_handler
 @register(pattern=".whois(?: |$)(.*)", outgoing=True)
 @errors_handler
 async def who(event):
-    if not event.text[0].isalpha() and event.text[0] not in ("/", "#", "@",
-                                                             "!"):
-        """ For .whois command, get info about a user. """
-        if event.fwd_from:
-            return
+    """ For .whois command, get info about a user. """
 
-        await event.edit(
-            "`Sit tight while I steal some data from Mark Zuckerburg...`")
+    await event.edit(
+        "`Sit tight while I steal some data from Mark Zuckerburg...`")
 
-        if not os.path.isdir(TEMP_DOWNLOAD_DIRECTORY):
-            os.makedirs(TEMP_DOWNLOAD_DIRECTORY)
+    if not os.path.isdir(TEMP_DOWNLOAD_DIRECTORY):
+        os.makedirs(TEMP_DOWNLOAD_DIRECTORY)
 
-        replied_user = await get_user(event)
+    replied_user = await get_user(event)
 
-        photo, caption = await fetch_info(replied_user, event)
+    photo, caption = await fetch_info(replied_user, event)
 
-        message_id_to_reply = event.message.reply_to_msg_id
+    message_id_to_reply = event.message.reply_to_msg_id
 
-        if not message_id_to_reply:
-            message_id_to_reply = None
+    if not message_id_to_reply:
+        message_id_to_reply = None
 
-        try:
-            await event.client.send_file(event.chat_id,
-                                         photo,
-                                         caption=caption,
-                                         link_preview=False,
-                                         force_document=False,
-                                         reply_to=message_id_to_reply,
-                                         parse_mode="html")
+    try:
+        await event.client.send_file(event.chat_id,
+                                     photo,
+                                     caption=caption,
+                                     link_preview=False,
+                                     force_document=False,
+                                     reply_to=message_id_to_reply,
+                                     parse_mode="html")
 
-            if not photo.startswith("http"):
-                os.remove(photo)
-            await event.delete()
+        if not photo.startswith("http"):
+            os.remove(photo)
+        await event.delete()
 
-        except TypeError:
-            await event.edit(caption, parse_mode="html")
+    except TypeError:
+        await event.edit(caption, parse_mode="html")
 
 
 async def get_user(event):

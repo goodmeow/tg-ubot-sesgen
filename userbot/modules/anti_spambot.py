@@ -33,7 +33,10 @@ async def ANTI_SPAMBOT(welcm):
 
             if welcm.user_added:
                 ignore = False
-                adder = welcm.action_message.from_id
+                try:
+                    adder = welcm.action_message.from_id
+                except AttributeError:
+                    return
 
             async for admin in bot.iter_participants(
                     welcm.chat_id, filter=ChannelParticipantsAdmins):

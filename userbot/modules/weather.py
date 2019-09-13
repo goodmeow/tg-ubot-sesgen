@@ -35,10 +35,8 @@ async def get_tz(con):
 @errors_handler
 async def get_weather(weather):
     """ For .weather command, gets the current weather of a city. """
-    if not weather.text.startswith("."):
-        return
 
-    if len(OWM_API) < 1:
+    if not OWM_API:
         await weather.edit(
             "`Get an API key from` https://openweathermap.org/ `first.`")
         return
@@ -135,10 +133,8 @@ async def get_weather(weather):
 @errors_handler
 async def set_default_city(city):
     """ For .ctime command, change the default userbot country for date and time commands. """
-    if not city.text.startswith("."):
-        return
 
-    if len(OWM_API) < 1:
+    if not OWM_API:
         await city.edit(
             "`Get an API key from` https://openweathermap.org/ `first.`")
         return

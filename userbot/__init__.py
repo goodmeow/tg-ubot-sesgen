@@ -12,6 +12,7 @@ from logging import basicConfig, getLogger, INFO, DEBUG
 from distutils.util import strtobool as sb
 
 import pylast
+from pySmartDL import SmartDL
 from dotenv import load_dotenv
 from requests import get
 from telethon import TelegramClient
@@ -125,6 +126,23 @@ G_DRIVE_AUTH_TOKEN_DATA = os.environ.get("G_DRIVE_AUTH_TOKEN_DATA", None)
 GDRIVE_FOLDER_ID = os.environ.get("GDRIVE_FOLDER_ID", None)
 TEMP_DOWNLOAD_DIRECTORY = os.environ.get("TMP_DOWNLOAD_DIRECTORY",
                                          "./downloads")
+
+# Setting Up CloudMail.ru and MEGA.nz extractor binaries,
+# and giving them correct perms to work properly.
+if not os.path.exists('bin'):
+    os.mkdir('bin')
+
+binaries = {
+    "https://raw.githubusercontent.com/yshalsager/megadown/master/megadown":
+    "bin/megadown",
+    "https://raw.githubusercontent.com/yshalsager/cmrudl.py/master/cmrudl.py":
+    "bin/cmrudl"
+}
+
+for binary, path in binaries:
+    downloader = SmartDL(binary, path, progress_bar=False)
+    downloader.start()
+    os.chmod(path, 0o755)
 
 # 'bot' variable
 if STRING_SESSION:

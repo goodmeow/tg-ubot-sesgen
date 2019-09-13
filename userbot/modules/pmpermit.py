@@ -26,7 +26,6 @@ UNAPPROVED_MSG = (
 
 
 @register(incoming=True, disable_edited=True)
-@errors_handler
 async def permitpm(event):
     """ Prohibits people from PMing you without approval. \
         Will block retarded nibbas automatically. """
@@ -139,168 +138,149 @@ async def auto_accept(event):
 @errors_handler
 async def notifoff(noff_event):
     """ For .notifoff command, stop getting notifications from unapproved PMs. """
-    if not noff_event.text[0].isalpha() and noff_event.text[0] not in (
-            "/", "#", "@", "!"):
-        try:
-            from userbot.modules.sql_helper.globals import addgvar
-        except AttributeError:
-            return
-        addgvar("NOTIF_OFF", True)
-        await noff_event.edit(
-            "`Notifications from unapproved PM's are silenced!`")
+    try:
+        from userbot.modules.sql_helper.globals import addgvar
+    except AttributeError:
+        return
+    addgvar("NOTIF_OFF", True)
+    await noff_event.edit("`Notifications from unapproved PM's are silenced!`")
 
 
 @register(outgoing=True, pattern="^.notifon$")
 @errors_handler
 async def notifon(non_event):
     """ For .notifoff command, get notifications from unapproved PMs. """
-    if not non_event.text[0].isalpha() and non_event.text[0] not in ("/", "#",
-                                                                     "@", "!"):
-        try:
-            from userbot.modules.sql_helper.globals import delgvar
-        except AttributeError:
-            return
-        delgvar("NOTIF_OFF")
-        await non_event.edit("`Notifications from unapproved PM's unmuted!`")
+    try:
+        from userbot.modules.sql_helper.globals import delgvar
+    except AttributeError:
+        return
+    delgvar("NOTIF_OFF")
+    await non_event.edit("`Notifications from unapproved PM's unmuted!`")
 
 
 @register(outgoing=True, pattern="^.approve$")
 @errors_handler
 async def approvepm(apprvpm):
     """ For .approve command, give someone the permissions to PM you. """
-    if not apprvpm.text[0].isalpha() and apprvpm.text[0] not in ("/", "#", "@",
-                                                                 "!"):
-        try:
-            from userbot.modules.sql_helper.pm_permit_sql import approve
-        except AttributeError:
-            await apprvpm.edit("`Running on Non-SQL mode!`")
-            return
+    try:
+        from userbot.modules.sql_helper.pm_permit_sql import approve
+    except AttributeError:
+        await apprvpm.edit("`Running on Non-SQL mode!`")
+        return
 
-        if apprvpm.reply_to_msg_id:
-            reply = await apprvpm.get_reply_message()
-            replied_user = await apprvpm.client(
-                GetFullUserRequest(reply.from_id))
-            aname = replied_user.user.id
-            name0 = str(replied_user.user.first_name)
-            uid = replied_user.user.id
+    if apprvpm.reply_to_msg_id:
+        reply = await apprvpm.get_reply_message()
+        replied_user = await apprvpm.client(GetFullUserRequest(reply.from_id))
+        aname = replied_user.user.id
+        name0 = str(replied_user.user.first_name)
+        uid = replied_user.user.id
 
-        else:
-            aname = await apprvpm.client.get_entity(apprvpm.chat_id)
-            name0 = str(aname.first_name)
-            uid = apprvpm.chat_id
+    else:
+        aname = await apprvpm.client.get_entity(apprvpm.chat_id)
+        name0 = str(aname.first_name)
+        uid = apprvpm.chat_id
 
-        try:
-            approve(uid)
-        except IntegrityError:
-            await apprvpm.edit("`User may already be approved.`")
-            return
+    try:
+        approve(uid)
+    except IntegrityError:
+        await apprvpm.edit("`User may already be approved.`")
+        return
 
-        await apprvpm.edit(f"[{name0}](tg://user?id={uid}) `approved to PM!`")
+    await apprvpm.edit(f"[{name0}](tg://user?id={uid}) `approved to PM!`")
 
-        async for message in apprvpm.client.iter_messages(
-                apprvpm.chat_id, from_user='me', search=UNAPPROVED_MSG):
-            await message.delete()
+    async for message in apprvpm.client.iter_messages(apprvpm.chat_id,
+                                                      from_user='me',
+                                                      search=UNAPPROVED_MSG):
+        await message.delete()
 
-        if BOTLOG:
-            await apprvpm.client.send_message(
-                BOTLOG_CHATID,
-                "#APPROVED\n" + "User: " + f"[{name0}](tg://user?id={uid})",
-            )
+    if BOTLOG:
+        await apprvpm.client.send_message(
+            BOTLOG_CHATID,
+            "#APPROVED\n" + "User: " + f"[{name0}](tg://user?id={uid})",
+        )
 
 
 @register(outgoing=True, pattern="^.disapprove$")
 @errors_handler
 async def disapprovepm(disapprvpm):
-    if not disapprvpm.text[0].isalpha() and disapprvpm.text[0] not in (
-            "/", "#", "@", "!"):
-        try:
-            from userbot.modules.sql_helper.pm_permit_sql import dissprove
-        except BaseException:
-            await disapprvpm.edit("`Running on Non-SQL mode!`")
-            return
+    try:
+        from userbot.modules.sql_helper.pm_permit_sql import dissprove
+    except BaseException:
+        await disapprvpm.edit("`Running on Non-SQL mode!`")
+        return
 
-        if disapprvpm.reply_to_msg_id:
-            reply = await disapprvpm.get_reply_message()
-            replied_user = await disapprvpm.client(
-                GetFullUserRequest(reply.from_id))
-            aname = replied_user.user.id
-            name0 = str(replied_user.user.first_name)
-            dissprove(replied_user.user.id)
-        else:
-            dissprove(disapprvpm.chat_id)
-            aname = await disapprvpm.client.get_entity(disapprvpm.chat_id)
-            name0 = str(aname.first_name)
+    if disapprvpm.reply_to_msg_id:
+        reply = await disapprvpm.get_reply_message()
+        replied_user = await disapprvpm.client(
+            GetFullUserRequest(reply.from_id))
+        aname = replied_user.user.id
+        name0 = str(replied_user.user.first_name)
+        dissprove(replied_user.user.id)
+    else:
+        dissprove(disapprvpm.chat_id)
+        aname = await disapprvpm.client.get_entity(disapprvpm.chat_id)
+        name0 = str(aname.first_name)
 
-        await disapprvpm.edit(
-            f"[{name0}](tg://user?id={disapprvpm.chat_id}) `Disaproved to PM!`"
+    await disapprvpm.edit(
+        f"[{name0}](tg://user?id={disapprvpm.chat_id}) `Disaproved to PM!`")
+
+    if BOTLOG:
+        await disapprvpm.client.send_message(
+            BOTLOG_CHATID,
+            f"[{name0}](tg://user?id={disapprvpm.chat_id})"
+            " was disapproved to PM you.",
         )
-
-        if BOTLOG:
-            await disapprvpm.client.send_message(
-                BOTLOG_CHATID,
-                f"[{name0}](tg://user?id={disapprvpm.chat_id})"
-                " was disapproved to PM you.",
-            )
 
 
 @register(outgoing=True, pattern="^.block$")
 @errors_handler
 async def blockpm(block):
     """ For .block command, block people from PMing you! """
-    if not block.text[0].isalpha() and block.text[0] not in ("/", "#", "@",
-                                                             "!"):
-
+    if block.reply_to_msg_id:
+        reply = await block.get_reply_message()
+        replied_user = await block.client(GetFullUserRequest(reply.from_id))
+        aname = replied_user.user.id
+        name0 = str(replied_user.user.first_name)
+        await block.client(BlockRequest(replied_user.user.id))
         await block.edit("`You've been blocked!`")
+        uid = replied_user.user.id
+    else:
+        await block.client(BlockRequest(block.chat_id))
+        aname = await block.client.get_entity(block.chat_id)
+        await block.edit("`You've been blocked!`")
+        name0 = str(aname.first_name)
+        uid = block.chat_id
 
-        if block.reply_to_msg_id:
-            reply = await block.get_reply_message()
-            replied_user = await block.client(GetFullUserRequest(reply.from_id)
-                                              )
-            aname = replied_user.user.id
-            name0 = str(replied_user.user.first_name)
-            await block.client(BlockRequest(replied_user.user.id))
-            uid = replied_user.user.id
-        else:
-            await block.client(BlockRequest(block.chat_id))
-            aname = await block.client.get_entity(block.chat_id)
-            name0 = str(aname.first_name)
-            uid = block.chat_id
+    try:
+        from userbot.modules.sql_helper.pm_permit_sql import dissprove
+        dissprove(uid)
+    except AttributeError:
+        pass
 
-        try:
-            from userbot.modules.sql_helper.pm_permit_sql import dissprove
-            dissprove(uid)
-        except AttributeError:  # Non-SQL mode.
-            pass
-
-        if BOTLOG:
-            await block.client.send_message(
-                BOTLOG_CHATID,
-                "#BLOCKED\n" + "User: " + f"[{name0}](tg://user?id={uid})",
-            )
+    if BOTLOG:
+        await block.client.send_message(
+            BOTLOG_CHATID,
+            "#BLOCKED\n" + "User: " + f"[{name0}](tg://user?id={uid})",
+        )
 
 
 @register(outgoing=True, pattern="^.unblock$")
 @errors_handler
 async def unblockpm(unblock):
     """ For .unblock command, let people PMing you again! """
-    if not unblock.text[0].isalpha() and unblock.text[0] \
-            not in ("/", "#", "@", "!") and unblock.reply_to_msg_id:
-
+    if unblock.reply_to_msg_id:
+        reply = await unblock.get_reply_message()
+        replied_user = await unblock.client(GetFullUserRequest(reply.from_id))
+        name0 = str(replied_user.user.first_name)
+        await unblock.client(UnblockRequest(replied_user.user.id))
         await unblock.edit("`You have been unblocked.`")
 
-        if unblock.reply_to_msg_id:
-            reply = await unblock.get_reply_message()
-            replied_user = await unblock.client(
-                GetFullUserRequest(reply.from_id))
-            name0 = str(replied_user.user.first_name)
-            await unblock.client(UnblockRequest(replied_user.user.id))
-
-        if BOTLOG:
-            await unblock.client.send_message(
-                BOTLOG_CHATID,
-                f"[{name0}](tg://user?id={replied_user.user.id})"
-                " was unblocc'd!.",
-            )
+    if BOTLOG:
+        await unblock.client.send_message(
+            BOTLOG_CHATID,
+            f"[{name0}](tg://user?id={replied_user.user.id})"
+            " was unblocc'd!.",
+        )
 
 
 CMD_HELP.update({

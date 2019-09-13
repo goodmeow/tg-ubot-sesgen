@@ -19,81 +19,77 @@ TYPE_DOCUMENT = 2
 @errors_handler
 async def notes_active(svd):
     """ For .saved command, list all of the notes saved in a chat. """
-    if not svd.text[0].isalpha() and svd.text[0] not in ("/", "#", "@", "!"):
-        try:
-            from userbot.modules.sql_helper.notes_sql import get_notes
-        except AttributeError:
-            await svd.edit("`Running on Non-SQL mode!`")
-            return
+    try:
+        from userbot.modules.sql_helper.notes_sql import get_notes
+    except AttributeError:
+        await svd.edit("`Running on Non-SQL mode!`")
+        return
 
-        message = "`There are no saved notes in this chat`"
-        notes = get_notes(svd.chat_id)
-        for note in notes:
-            if message == "`There are no saved notes in this chat`":
-                message = "Notes saved in this chat:\n"
-                message += "- `#{}`\n".format(note.keyword)
-            else:
-                message += "- `#{}`\n".format(note.keyword)
+    message = "`There are no saved notes in this chat`"
+    notes = get_notes(svd.chat_id)
+    for note in notes:
+        if message == "`There are no saved notes in this chat`":
+            message = "Notes saved in this chat:\n"
+            message += "- `#{}`\n".format(note.keyword)
+        else:
+            message += "- `#{}`\n".format(note.keyword)
 
-        await svd.edit(message)
+    await svd.edit(message)
 
 
 @register(outgoing=True, pattern=r"^.clear (.*)")
 @errors_handler
 async def remove_notes(clr):
     """ For .clear command, clear note with the given name."""
-    if not clr.text[0].isalpha() and clr.text[0] not in ("/", "#", "@", "!"):
-        try:
-            from userbot.modules.sql_helper.notes_sql import rm_note
-        except AttributeError:
-            await clr.edit("`Running on Non-SQL mode!`")
-            return
-        notename = clr.pattern_match.group(1)
-        if rm_note(clr.chat_id, notename) is False:
-            return await clr.edit(
-                "`Couldn't find note:` **{}**".format(notename))
-        else:
-            return await clr.edit(
-                "`Successfully deleted note:` **{}**".format(notename))
+    try:
+        from userbot.modules.sql_helper.notes_sql import rm_note
+    except AttributeError:
+        await clr.edit("`Running on Non-SQL mode!`")
+        return
+    notename = clr.pattern_match.group(1)
+    if rm_note(clr.chat_id, notename) is False:
+        return await clr.edit("`Couldn't find note:` **{}**".format(notename))
+    else:
+        return await clr.edit(
+            "`Successfully deleted note:` **{}**".format(notename))
 
 
 @register(outgoing=True, pattern=r"^.save (.*)")
 @errors_handler
 async def add_filter(fltr):
     """ For .save command, saves notes in a chat. """
-    if not fltr.text[0].isalpha() and fltr.text[0] not in ("/", "#", "@", "!"):
-        try:
-            from userbot.modules.sql_helper.notes_sql import add_note
-        except AttributeError:
-            await fltr.edit("`Running on Non-SQL mode!`")
-            return
+    try:
+        from userbot.modules.sql_helper.notes_sql import add_note
+    except AttributeError:
+        await fltr.edit("`Running on Non-SQL mode!`")
+        return
 
-        notename = fltr.pattern_match.group(1)
-        msg = await fltr.get_reply_message()
-        if not msg:
-            await fltr.edit("`I need something to save as a note.`")
-        else:
-            snip = {'type': TYPE_TEXT, 'text': msg.message or ''}
-            if msg.media:
-                media = None
-                if isinstance(msg.media, types.MessageMediaPhoto):
-                    media = utils.get_input_photo(msg.media.photo)
-                    snip['type'] = TYPE_PHOTO
-                elif isinstance(msg.media, types.MessageMediaDocument):
-                    media = utils.get_input_document(msg.media.document)
-                    snip['type'] = TYPE_DOCUMENT
-                if media:
-                    snip['id'] = media.id
-                    snip['hash'] = media.access_hash
-                    snip['fr'] = media.file_reference
+    notename = fltr.pattern_match.group(1)
+    msg = await fltr.get_reply_message()
+    if not msg:
+        await fltr.edit("`I need something to save as a note.`")
+    else:
+        snip = {'type': TYPE_TEXT, 'text': msg.message or ''}
+        if msg.media:
+            media = None
+            if isinstance(msg.media, types.MessageMediaPhoto):
+                media = utils.get_input_photo(msg.media.photo)
+                snip['type'] = TYPE_PHOTO
+            elif isinstance(msg.media, types.MessageMediaDocument):
+                media = utils.get_input_document(msg.media.document)
+                snip['type'] = TYPE_DOCUMENT
+            if media:
+                snip['id'] = media.id
+                snip['hash'] = media.access_hash
+                snip['fr'] = media.file_reference
 
-        success = "`Note {} successfully. Use` #{} `to get it`"
+    success = "`Note {} successfully. Use` #{} `to get it`"
 
-        if add_note(str(fltr.chat_id), notename, snip['text'], snip['type'],
-                    snip.get('id'), snip.get('hash'), snip.get('fr')) is False:
-            return await fltr.edit(success.format('updated', notename))
-        else:
-            return await fltr.edit(success.format('added', notename))
+    if add_note(str(fltr.chat_id), notename, snip['text'], snip['type'],
+                snip.get('id'), snip.get('hash'), snip.get('fr')) is False:
+        return await fltr.edit(success.format('updated', notename))
+    else:
+        return await fltr.edit(success.format('added', notename))
 
 
 @register(pattern=r"#\w*", disable_edited=True)
@@ -136,27 +132,26 @@ async def incom_note(getnt):
 async def kick_marie_notes(kick):
     """ For .rmfilters command, allows you to kick all \
         Marie(or her clones) filters from a chat. """
-    if not kick.text[0].isalpha() and kick.text[0] not in ("/", "#", "@", "!"):
-        bot_type = kick.pattern_match.group(1)
-        if bot_type not in ["marie", "rose"]:
-            await kick.edit("`That bot is not yet supported!`")
-            return
-        await kick.edit("```Will be kicking away all Notes!```")
-        await sleep(3)
-        resp = await kick.get_reply_message()
-        filters = resp.text.split("-")[1:]
-        for i in filters:
-            if bot_type == "marie":
-                await kick.reply("/clear %s" % (i.strip()))
-            if bot_type == "rose":
-                i = i.replace('`', '')
-                await kick.reply("/clear %s" % (i.strip()))
-            await sleep(0.3)
-        await kick.respond(
-            "```Successfully purged bots notes yaay!```\n Gimme cookies!")
-        if BOTLOG:
-            await kick.client.send_message(
-                BOTLOG_CHATID, "I cleaned all Notes at " + str(kick.chat_id))
+    bot_type = kick.pattern_match.group(1).lower()
+    if bot_type not in ["marie", "rose"]:
+        await kick.edit("`That bot is not yet supported!`")
+        return
+    await kick.edit("```Will be kicking away all Notes!```")
+    await sleep(3)
+    resp = await kick.get_reply_message()
+    filters = resp.text.split("-")[1:]
+    for i in filters:
+        if bot_type == "marie":
+            await kick.reply("/clear %s" % (i.strip()))
+        if bot_type == "rose":
+            i = i.replace('`', '')
+            await kick.reply("/clear %s" % (i.strip()))
+        await sleep(0.3)
+    await kick.respond(
+        "```Successfully purged bots notes yaay!```\n Gimme cookies!")
+    if BOTLOG:
+        await kick.client.send_message(
+            BOTLOG_CHATID, "I cleaned all Notes at " + str(kick.chat_id))
 
 
 CMD_HELP.update({
