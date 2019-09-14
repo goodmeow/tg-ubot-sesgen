@@ -5,7 +5,9 @@
 #
 """ Userbot module containing various scrapers. """
 
-import os, time
+import os
+import time
+import asyncio
 import shutil
 from bs4 import BeautifulSoup
 import re
@@ -586,42 +588,63 @@ async def download_video(v_url):
         song = False
         video = True
 
-    else:
-        await v_url.edit("``")
-        return
     try:
         await v_url.edit("`Downloading...`")
         with youtube_dl.YoutubeDL(opts) as rip:
             rip_data = rip.extract_info(url)
             title = rip_data['title']
-        await v_url.edit(f"`Uploading...`")
-        c_time = time.time()
-        if song:
-            await v_url.client.send_file(
-                v_url.chat_id,
-                f"{title}.mp3",
-                supports_streaming=True,
-                progress_callback=lambda d, t: asyncio.get_event_loop(
-                ).create_task(
-                    progress(d, t, u_event, c_time, "Uploading..",
-                             f"{title}.mp3")))
-            os.remove(f"{title}.mp3")
-            await v_url.delete()
-        elif video:
-            await v_url.client.send_file(
-                v_url.chat_id,
-                f"{title}.mp4",
-                supports_streaming=True,
-                caption=rip_data['title'],
-                progress_callback=lambda d, t: asyncio.get_event_loop(
-                ).create_task(
-                    progress(d, t, u_event, c_time, "Uploading..",
-                             f"{title}.mp4")))
-            os.remove(f"{title}.mp4")
-            await v_url.delete()
-    except Exception as err:
-        await v_url.edit(f"Error: {str(err)}")
+    except DownloadError as DE:
+        await v_url.edit(f"`{str(DE)}`")
         return
+    except ContentTooShortError:
+        await v_url.edit("`The download content was too short.`")
+        return
+    except GeoRestrictedError:
+        await v_url.edit("`Video is not available from your geographic location due to geographic restrictions imposed by a website.`")
+        return
+    except MaxDownloadsReached:
+        await v_url.edit("`Max-downloads limit has been reached.`")
+        return
+    except PostProcessingError:
+        await v_url.edit("`There was an error during post processing.`")
+        return
+    except UnavailableVideoError:
+        await v_url.edit("`Media is not available in the requested format.`")
+        return
+    except XAttrMetadataError as XAME:
+        await v_url.edit(f"`{XAME.code}: {XAME.msg}\n{XAME.reason}`")
+        return
+    except ExtractorError:
+        await v_url.edit("`There was an error during info extraction.`")
+        return
+    except Exception as e:
+        await v_url.edit(f"{str(type(e)): {str(e)}}")
+        return
+    await v_url.edit(f"`Uploading...`")
+    c_time = time.time()
+    if song:
+        await v_url.client.send_file(
+            v_url.chat_id,
+            f"{title}.mp3",
+            supports_streaming=True,
+            progress_callback=lambda d, t: asyncio.get_event_loop(
+            ).create_task(
+                progress(d, t, u_event, c_time, "Uploading..",
+                         f"{title}.mp3")))
+        os.remove(f"{title}.mp3")
+        await v_url.delete()
+    elif video:
+        await v_url.client.send_file(
+            v_url.chat_id,
+            f"{title}.mp4",
+            supports_streaming=True,
+            caption=rip_data['title'],
+            progress_callback=lambda d, t: asyncio.get_event_loop(
+            ).create_task(
+                progress(d, t, u_event, c_time, "Uploading..",
+                         f"{title}.mp4")))
+        os.remove(f"{title}.mp4")
+        await v_url.delete()
 
 
 async def deEmojify(inputString):
@@ -675,5 +698,5 @@ CMD_HELP.update(
 CMD_HELP.update({
     'rip':
     '.ripmp3 <url> or ripmp4 <url>\
-        \nUsage: Download videos and songs from YouTube (and many other sites).'
+        \nUsage: Download videos and songs from YouTube (and [many other sites](https://ytdl-org.github.io/youtube-dl/supportedsites.html)).'
 })
