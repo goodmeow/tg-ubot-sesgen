@@ -550,7 +550,7 @@ async def download_video(v_url):
                 'preferredquality': '320',
             }],
             'outtmpl':
-            'rip.mp3',
+            '%(title)s.mp3',
             'quiet':
             True,
             'logtostderr':
@@ -573,13 +573,10 @@ async def download_video(v_url):
             True,
             'postprocessors': [{
                 'key': 'FFmpegVideoConvertor',
-                'preferedformat': 'mp4',
-                'key': 'EmbedThumbnail'
+                'preferedformat': 'mp4'
             }],
             'outtmpl':
-            'rip.mp4',
-            'writethumbnail':
-            True,
+            '%(title)s.mp4',
             'logtostderr':
             False,
             'quiet':
@@ -595,21 +592,22 @@ async def download_video(v_url):
         await v_url.edit("`Downloading...`")
         with youtube_dl.YoutubeDL(opts) as rip:
             rip_data = rip.extract_info(url)
+            title = rip_data['title']
         await v_url.edit(f"`Uploading...`")
         if song:
             await v_url.client.send_file(v_url.chat_id,
-                                         "rip.mp3",
-                                         voice_note=True,
-                                         reply_to=v_url.id,
+                                         f"{title}.mp3",
+                                         supports_streaming=True,
                                          caption=rip_data['title'])
-            os.remove("rip.mp3")
+            os.remove(f"{title}.mp3")
+            await v_url.delete()
         elif video:
             await v_url.client.send_file(v_url.chat_id,
-                                         "rip.mp4",
+                                         f"{title}.mp4",
                                          supports_streaming=True,
-                                         reply_to=v_url.id,
                                          caption=rip_data['title'])
-            os.remove("rip.mp4")
+            os.remove(f"{title}.mp4")
+            await v_url.delete()
     except Exception as err:
         await v_url.edit(f"Error: {str(err)}")
         return
