@@ -521,19 +521,23 @@ async def youtube_search(query,
         return (nexttok, videos)
 
 
-@register(outgoing=True, pattern=r".rip (\S*) ?(\S*)")
+@register(outgoing=True, pattern=r".rip(mp3|mp4) (.*)")
 @errors_handler
 async def download_video(v_url):
     """ For .rip command, download media from YouTube + 800 other sites. """
-    url = v_url.pattern_match.group(1)
-    type = v_url.pattern_match.group(2).lower()
+    url = v_url.pattern_match.group(2)
+    type = v_url.pattern_match.group(1).lower()
 
-    await v_url.edit("**Preparing to download..**")
+    await v_url.edit("`Preparing to download...`")
 
-    if type.lower() in ['aac', 'flac', 'mp3', 'm4a', 'opus', 'vorbis', 'wav']:
+    if type == "mp3":
         opts = {
             'format':
             'bestaudio',
+            'key':
+            'FFmpegMetadata',
+            'writethumbnail':
+            True,
             'prefer_ffmpeg':
             True,
             'geo_bypass':
@@ -542,21 +546,25 @@ async def download_video(v_url):
             True,
             'postprocessors': [{
                 'key': 'FFmpegExtractAudio',
-                'preferredcodec': type,
+                'preferredcodec': 'mp3',
                 'preferredquality': '320',
             }],
             'outtmpl':
-            '%(title)s.%(ext)s',
+            'rip.mp3',
             'quiet':
             True,
             'logtostderr':
             False
         }
+        video = False
+        song = True
 
-    elif type.lower() in ['mp4', 'flv', 'ogg', 'webm', 'mkv', 'avi']:
+    elif type == "mp4":
         opts = {
             'format':
             'best',
+            'key':
+            'FFmpegMetadata',
             'prefer_ffmpeg':
             True,
             'geo_bypass':
@@ -565,33 +573,43 @@ async def download_video(v_url):
             True,
             'postprocessors': [{
                 'key': 'FFmpegVideoConvertor',
-                'preferedformat': type
+                'preferedformat': 'mp4',
+                'key': 'EmbedThumbnail'
             }],
             'outtmpl':
-            '%(title)s.%(ext)s',
+            'rip.mp4',
+            'writethumbnail':
+            True,
             'logtostderr':
             False,
             'quiet':
             True
         }
+        song = False
+        video = True
 
     else:
-        opts = {
-            'format': 'best',
-            'key': 'FFmpegMetadata',
-            'prefer_ffmpeg': True,
-            'geo_bypass': True,
-            'nocheckcertificate': True,
-            'outtmpl': '%(title)s.%(ext)s',
-            'logtostderr': False,
-            'quiet': True
-        }
-
+        await v_url.edit("``")
+        return
     try:
-        await v_url.edit("**Downloading...**")
+        await v_url.edit("`Downloading...`")
         with youtube_dl.YoutubeDL(opts) as rip:
-            rip.download([url])
-        await v_url.edit(f"Downloaded succesfully !!")
+            rip_data = rip.extract_info(url)
+        await v_url.edit(f"`Uploading...`")
+        if song:
+            await v_url.client.send_file(v_url.chat_id,
+                                         "rip.mp3",
+                                         voice_note=True,
+                                         reply_to=v_url.id,
+                                         caption=rip_data['title'])
+            os.remove("rip.mp3")
+        elif video:
+            await v_url.client.send_file(v_url.chat_id,
+                                         "rip.mp4",
+                                         supports_streaming=True,
+                                         reply_to=v_url.id,
+                                         caption=rip_data['title'])
+            os.remove("rip.mp4")
     except Exception as err:
         await v_url.edit(f"Error: {str(err)}")
         return
@@ -647,6 +665,6 @@ CMD_HELP.update(
     {"imdb": ".imdb <movie-name>\nShows movie info and other stuffs"})
 CMD_HELP.update({
     'rip':
-    '.rip <url>\
-        \nUsage: Download videos from YouTube (and many other sites). If no quality is specified, the highest downloadable quality is downloaded.'
+    '.ripmp3 <url> or ripmp4 <url>\
+        \nUsage: Download videos and songs from YouTube (and many other sites).'
 })
