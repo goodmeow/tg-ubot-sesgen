@@ -33,6 +33,7 @@ from asyncio import sleep
 
 from userbot import CMD_HELP, BOTLOG, BOTLOG_CHATID, YOUTUBE_API_KEY, CHROME_DRIVER, GOOGLE_CHROME_BIN
 from userbot.events import register, errors_handler
+from userbot.modules.upload_download import progress, humanbytes, time_formatter
 
 CARBONLANG = "auto"
 LANG = "en"
@@ -594,18 +595,28 @@ async def download_video(v_url):
             rip_data = rip.extract_info(url)
             title = rip_data['title']
         await v_url.edit(f"`Uploading...`")
+        c_time = time.time()
         if song:
-            await v_url.client.send_file(v_url.chat_id,
-                                         f"{title}.mp3",
-                                         supports_streaming=True,
-                                         caption=rip_data['title'])
+            await v_url.client.send_file(
+                v_url.chat_id,
+                f"{title}.mp3",
+                supports_streaming=True,
+                progress_callback=lambda d, t: asyncio.get_event_loop(
+                ).create_task(
+                    progress(d, t, u_event, c_time, "Uploading..",
+                             f"{title}.mp3")))
             os.remove(f"{title}.mp3")
             await v_url.delete()
         elif video:
-            await v_url.client.send_file(v_url.chat_id,
-                                         f"{title}.mp4",
-                                         supports_streaming=True,
-                                         caption=rip_data['title'])
+            await v_url.client.send_file(
+                v_url.chat_id,
+                f"{title}.mp4",
+                supports_streaming=True,
+                caption=rip_data['title'],
+                progress_callback=lambda d, t: asyncio.get_event_loop(
+                ).create_task(
+                    progress(d, t, u_event, c_time, "Uploading..",
+                             f"{title}.mp4")))
             os.remove(f"{title}.mp4")
             await v_url.delete()
     except Exception as err:

@@ -189,7 +189,8 @@ async def check_progress_for_dl(gid, event, previous):
                 await event.edit(
                     "Download Auto Canceled :\n`{}`\nYour Torrent/Link is Dead."
                     .format(file.name))
-                
+
+
 CMD_HELP.update({
     "aria":
     ".aria url <URL> (or) .aria magnet <magnet link> (or) .aria tor <path to torrent file>\
