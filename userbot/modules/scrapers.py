@@ -629,7 +629,7 @@ async def download_video(v_url):
             supports_streaming=True,
             progress_callback=lambda d, t: asyncio.get_event_loop(
             ).create_task(
-                progress(d, t, u_event, c_time, "Uploading..",
+                progress(d, t, v_url, c_time, "Uploading..",
                          f"{title}.mp3")))
         os.remove(f"{title}.mp3")
         await v_url.delete()
@@ -641,7 +641,7 @@ async def download_video(v_url):
             caption=rip_data['title'],
             progress_callback=lambda d, t: asyncio.get_event_loop(
             ).create_task(
-                progress(d, t, u_event, c_time, "Uploading..",
+                progress(d, t, v_url, c_time, "Uploading..",
                          f"{title}.mp4")))
         os.remove(f"{title}.mp4")
         await v_url.delete()
