@@ -17,8 +17,6 @@ aria2 = aria2p.API(aria2p.Client(host="http://localhost", port=6800,
 
 @register(outgoing=True, pattern="^.magnet(?: |$)(.*)")
 async def magnet_download(event):
-    if event.fwd_from:
-        return
     var = event.raw_text
     var = var.split(" ")
     magnet_uri = var[1]
@@ -39,8 +37,6 @@ async def magnet_download(event):
 
 @register(outgoing=True, pattern="^.tor(?: |$)(.*)")
 async def torrent_download(event):
-    if event.fwd_from:
-        return
     var = event.raw_text
     var = var.split(" ")
     torrent_file_path = var[1]
@@ -60,8 +56,6 @@ async def torrent_download(event):
 
 @register(outgoing=True, pattern="^.url(?: |$)(.*)")
 async def magnet_download(event):
-    if event.fwd_from:
-        return
     var = event.text[5:]
     print(var)
     uris = [var]
@@ -81,8 +75,6 @@ async def magnet_download(event):
 
 @register(outgoing=True, pattern="^.remove(?: |$)(.*)")
 async def remove_all(event):
-    if event.fwd_from:
-        return
     try:
         removed = aria2.remove_all(force=True)
         aria2.purge_all()
@@ -99,8 +91,6 @@ async def remove_all(event):
 
 @register(outgoing=True, pattern="^.pause(?: |$)(.*)")
 async def pause_all(event):
-    if event.fwd_from:
-        return
     # Pause ALL Currently Running Downloads.
     paused = aria2.pause_all(force=True)
     await event.edit("`Pausing Ur File...`")
@@ -112,8 +102,6 @@ async def pause_all(event):
 
 @register(outgoing=True, pattern="^.resume(?: |$)(.*)")
 async def resume_all(event):
-    if event.fwd_from:
-        return
     resumed = aria2.resume_all()
     await event.edit("`Resuming Ur File...`")
     await asyncio.sleep(1)
@@ -124,8 +112,6 @@ async def resume_all(event):
 
 @register(outgoing=True, pattern="^.show(?: |$)(.*)")
 async def show_all(event):
-    if event.fwd_from:
-        return
     output = "output.txt"
     downloads = aria2.get_downloads()
     msg = ""
@@ -146,7 +132,7 @@ async def show_all(event):
             f.write(msg)
         await asyncio.sleep(2)
         await event.delete()
-        await borg.send_file(
+        await event.client.send_file(
             event.chat_id,
             output,
             force_document=True,
