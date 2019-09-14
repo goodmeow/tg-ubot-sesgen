@@ -30,7 +30,12 @@ from googleapiclient.errors import HttpError
 from googletrans import LANGUAGES, Translator
 from gtts import gTTS
 from emoji import get_emoji_regexp
-import youtube_dl
+from youtube_dl import YoutubeDL
+from youtube_dl.utils import (
+    DownloadError, ContentTooShortError, ExtractorError, GeoRestrictedError,
+    MaxDownloadsReached, PostProcessingError, UnavailableVideoError,
+    XAttrMetadataError
+)
 from asyncio import sleep
 
 from userbot import CMD_HELP, BOTLOG, BOTLOG_CHATID, YOUTUBE_API_KEY, CHROME_DRIVER, GOOGLE_CHROME_BIN
@@ -590,7 +595,7 @@ async def download_video(v_url):
 
     try:
         await v_url.edit("`Downloading...`")
-        with youtube_dl.YoutubeDL(opts) as rip:
+        with YoutubeDL(opts) as rip:
             rip_data = rip.extract_info(url)
             title = rip_data['title']
     except DownloadError as DE:
