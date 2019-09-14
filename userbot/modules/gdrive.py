@@ -210,6 +210,50 @@ async def gdrive_search_list(event):
     await event.edit(gsearch_results, link_preview=False)
 
 
+@register(
+    pattern=
+    r"^.gsetf https?://drive\.google\.com/drive/u/\d/folders/([-\w]{25,})",
+    outgoing=True)
+@errors_handler
+async def download(set):
+    """For .gsetf command, allows you to set path"""
+    await set.edit("Processing ...")
+    input_str = set.pattern_match.group(1)
+    if input_str:
+        parent_id = input_str
+        await set.edit(
+            "Custom Folder ID set successfully. The next uploads will upload to {parent_id} till `.gdriveclear`"
+        )
+        await set.delete()
+    else:
+        await set.edit(
+            "Use `.gdrivesp <link to GDrive Folder>` to set the folder to upload new files to."
+        )
+
+
+@register(pattern="^.gsetclear$", outgoing=True)
+@errors_handler
+async def download(gclr):
+    """For .gsetclear command, allows you clear ur curnt custom path"""
+    await gclr.reply("Processing ...")
+    parent_id = GDRIVE_FOLDER_ID
+    await gclr.edit("Custom Folder ID cleared successfully.")
+
+
+@register(pattern="^.gfolder$", outgoing=True)
+@errors_handler
+async def show_current_gdrove_folder(event):
+    if parent_id:
+        folder_link = f"https://drive.google.com/drive/folders/" + parent_id
+        await event.edit(
+            f"My userbot is currently uploading files [here]({folder_link})")
+    else:
+        await event.edit(
+            f"My userbot is currently uploading files to the root of my Google Drive storage.\
+            \nFind uploaded files [here](https://drive.google.com/drive/my-drive)"
+        )
+
+
 # Get mime type and name of given file
 def file_ops(file_path):
     mime_type = guess_type(file_path)[0]
@@ -380,7 +424,7 @@ async def gdrive_search(http, search_query):
         query = "title contains '{}'".format(search_query)
     drive_service = build("drive", "v2", http=http, cache_discovery=False)
     page_token = None
-    msg = f"<b>Google Drive Search </b>: <code>{search_query}</code>\n\n"
+    res = ""
     while True:
         try:
             response = drive_service.files().list(
@@ -392,36 +436,27 @@ async def gdrive_search(http, search_query):
                 file_title = file.get("title")
                 file_id = file.get("id")
                 if file.get("mimeType") == G_DRIVE_DIR_MIME_TYPE:
-                    msg += f"`{file_title} - (folder)`\nhttps://drive.google.com/drive/folders/{file_id}\n\n"
+                    res += f"`[FOLDER] {file_title}`\nhttps://drive.google.com/drive/folders/{file_id}\n\n"
                 else:
-                    msg += f"`{file_title}`\nhttps://drive.google.com/uc?id={file_id}&export=download\n\n"
+                    res += f"`{file_title}`\nhttps://drive.google.com/uc?id={file_id}&export=download\n\n"
             page_token = response.get("nextPageToken", None)
             if page_token is None:
                 break
         except Exception as e:
-            msg += str(e)
+            res += str(e)
             break
+    msg = f"**Google Drive Query**:\n`{search_query}`\n\n**Results**\n\n{res}"
     return msg
-
-
-@register(pattern="^.gfolder$", outgoing=True)
-@errors_handler
-async def show_current_gdrove_folder(event):
-    if parent_id:
-        folder_link = f"https://drive.google.com/drive/folders/" + parent_id
-        await event.edit(
-            f"My userbot is currently uploading files [here]({folder_link})")
-    else:
-        await event.edit(
-            f"My userbot is currently uploading files to the root of my Google Drive storage.\
-            \nFind uploaded files [here](https://drive.google.com/drive/my-drive)"
-        )
 
 
 CMD_HELP.update({
     "gdrive":
     ".gdrive <file_path / reply / URL|file_name>\
     \nUsage: Uploads the file in reply , URL or file path in server to your Google Drive.\
+    \n\n.gsetf <GDrive Folder URL>\
+    \nUsage:Sets the folder to upload new files to.\
+    \n\n.gsetclear\
+    \nUsage:Reverts to default upload destination.\
     \n\n.gfolder\
     \nUsage:Shows your current upload destination/folder.\
     \n\n.list <query>\
