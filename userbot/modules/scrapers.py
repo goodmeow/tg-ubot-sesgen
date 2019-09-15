@@ -40,6 +40,7 @@ from asyncio import sleep
 
 from userbot import CMD_HELP, BOTLOG, BOTLOG_CHATID, YOUTUBE_API_KEY, CHROME_DRIVER, GOOGLE_CHROME_BIN
 from userbot.events import register, errors_handler
+from telethon.tl.types import DocumentAttributeAudio
 from userbot.modules.upload_download import progress, humanbytes, time_formatter
 
 CARBONLANG = "auto"
@@ -305,7 +306,7 @@ async def text_to_speech(query):
         return
 
     try:
-        gTTS(message, LANG)
+        gTTS(message, TTS_LANG)
     except AssertionError:
         await query.edit(
             'The text is empty.\n'
@@ -461,7 +462,7 @@ async def lang(value):
     if util == "trt":
         global TRT_LANG
         arg = value.pattern_match.group(2).lower()
-        if LANG in LANGUAGES:
+        if arg in LANGUAGES:
             TRT_LANG = arg
             LANG = LANGUAGES[arg]
         else:
@@ -480,7 +481,7 @@ async def lang(value):
                 f"`Invalid Language code !!`\n`Available language codes for TTS`:\n\n`{tts_langs()}`"
             )
             return
-    await value.edit(f"`Language for {util} changed to {[LANG]}.`")
+    await value.edit(f"`Language for {util} changed to {LANG}.`")
     if BOTLOG:
         await value.client.send_message(
             BOTLOG_CHATID, f"`Language for {util} changed to {LANG}.`")
