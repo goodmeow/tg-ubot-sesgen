@@ -656,7 +656,8 @@ async def download_video(v_url):
             f"{rip_data['id']}.mp3",
             supports_streaming=True,
             attributes=[
-                DocumentAttributeAudio(title=str(rip_data['title']),
+                DocumentAttributeAudio(duration=int(rip_data['duration']),
+                                       title=str(rip_data['title']),
                                        performer=str(rip_data['uploader']))
             ],
             progress_callback=lambda d, t: asyncio.get_event_loop(
