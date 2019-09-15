@@ -29,13 +29,13 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from googletrans import LANGUAGES, Translator
 from gtts import gTTS
+from gtts.lang import tts_langs
 from emoji import get_emoji_regexp
 from youtube_dl import YoutubeDL
-from youtube_dl.utils import (
-    DownloadError, ContentTooShortError, ExtractorError, GeoRestrictedError,
-    MaxDownloadsReached, PostProcessingError, UnavailableVideoError,
-    XAttrMetadataError
-)
+from youtube_dl.utils import (DownloadError, ContentTooShortError,
+                              ExtractorError, GeoRestrictedError,
+                              MaxDownloadsReached, PostProcessingError,
+                              UnavailableVideoError, XAttrMetadataError)
 from asyncio import sleep
 
 from userbot import CMD_HELP, BOTLOG, BOTLOG_CHATID, YOUTUBE_API_KEY, CHROME_DRIVER, GOOGLE_CHROME_BIN
@@ -43,7 +43,8 @@ from userbot.events import register, errors_handler
 from userbot.modules.upload_download import progress, humanbytes, time_formatter
 
 CARBONLANG = "auto"
-LANG = "en"
+TTS_LANG = "en"
+TRT_LANG = "en"
 
 
 @register(outgoing=True, pattern="^.crblang (.*)")
@@ -330,8 +331,7 @@ async def text_to_speech(query):
         os.remove("k.mp3")
         if BOTLOG:
             await query.client.send_message(
-                BOTLOG_CHATID,
-                "tts of `" + message + "` executed successfully!")
+                BOTLOG_CHATID, "Text to Speech executed successfully !")
         await query.delete()
 
 
@@ -436,7 +436,7 @@ async def translateme(trans):
         return
 
     try:
-        reply_text = translator.translate(await deEmojify(message), dest=LANG)
+        reply_text = translator.translate(deEmojify(message), dest=TRT_LANG)
     except ValueError:
         await trans.edit("Invalid destination language.")
         return
@@ -453,16 +453,37 @@ async def translateme(trans):
         )
 
 
-@register(pattern=".lang (.*)", outgoing=True)
+@register(pattern=".lang (trt|tts) (.*)", outgoing=True)
 @errors_handler
 async def lang(value):
     """ For .lang command, change the default langauge of userbot scrapers. """
-    global LANG
-    LANG = value.pattern_match.group(1)
+    util = value.pattern_match.group(1).lower()
+    if util == "trt":
+        global TRT_LANG
+        arg = value.pattern_match.group(2).lower()
+        if LANG in LANGUAGES:
+            TRT_LANG = arg
+            LANG = LANGUAGES[arg]
+        else:
+            await value.edit(
+                f"`Invalid Language code !!`\n`Available language codes for TRT`:\n\n`{LANGUAGES}`"
+            )
+            return
+    elif util == "tts":
+        global TTS_LANG
+        arg = value.pattern_match.group(2).lower()
+        if arg in tts_langs():
+            TTS_LANG = arg
+            LANG = tts_langs()[arg]
+        else:
+            await value.edit(
+                f"`Invalid Language code !!`\n`Available language codes for TTS`:\n\n`{tts_langs()}`"
+            )
+            return
+    await value.edit(f"`Language for {util} changed to {[LANG]}.`")
     if BOTLOG:
         await value.client.send_message(
-            BOTLOG_CHATID, "Default language changed to **" + LANG + "**")
-        await value.edit("Default language changed to **" + LANG + "**")
+            BOTLOG_CHATID, f"`Language for {util} changed to {LANG}.`")
 
 
 @register(outgoing=True, pattern="^.yt (.*)")
@@ -529,7 +550,7 @@ async def youtube_search(query,
         return (nexttok, videos)
 
 
-@register(outgoing=True, pattern=r".rip(mp3|mp4) (.*)")
+@register(outgoing=True, pattern=r".rip (audio|video) (.*)")
 @errors_handler
 async def download_video(v_url):
     """ For .rip command, download media from YouTube + 800 other sites. """
@@ -538,7 +559,7 @@ async def download_video(v_url):
 
     await v_url.edit("`Preparing to download...`")
 
-    if type == "mp3":
+    if type == "audio":
         opts = {
             'format':
             'bestaudio',
@@ -558,7 +579,7 @@ async def download_video(v_url):
                 'preferredquality': '320',
             }],
             'outtmpl':
-            '%(title)s.mp3',
+            '%(id)s.mp3',
             'quiet':
             True,
             'logtostderr':
@@ -567,7 +588,7 @@ async def download_video(v_url):
         video = False
         song = True
 
-    elif type == "mp4":
+    elif type == "video":
         opts = {
             'format':
             'best',
@@ -584,7 +605,7 @@ async def download_video(v_url):
                 'preferedformat': 'mp4'
             }],
             'outtmpl':
-            '%(title)s.mp4',
+            '%(id)s.mp4',
             'logtostderr':
             False,
             'quiet':
@@ -597,7 +618,6 @@ async def download_video(v_url):
         await v_url.edit("`Downloading...`")
         with YoutubeDL(opts) as rip:
             rip_data = rip.extract_info(url)
-            title = rip_data['title']
     except DownloadError as DE:
         await v_url.edit(f"`{str(DE)}`")
         return
@@ -605,7 +625,9 @@ async def download_video(v_url):
         await v_url.edit("`The download content was too short.`")
         return
     except GeoRestrictedError:
-        await v_url.edit("`Video is not available from your geographic location due to geographic restrictions imposed by a website.`")
+        await v_url.edit(
+            "`Video is not available from your geographic location due to geographic restrictions imposed by a website.`"
+        )
         return
     except MaxDownloadsReached:
         await v_url.edit("`Max-downloads limit has been reached.`")
@@ -630,29 +652,33 @@ async def download_video(v_url):
     if song:
         await v_url.client.send_file(
             v_url.chat_id,
-            f"{title}.mp3",
+            f"{rip_data['id']}.mp3",
             supports_streaming=True,
+            attributes=[
+                DocumentAttributeAudio(title=str(rip_data['title']),
+                                       performer=str(rip_data['uploader']))
+            ],
             progress_callback=lambda d, t: asyncio.get_event_loop(
             ).create_task(
                 progress(d, t, v_url, c_time, "Uploading..",
-                         f"{title}.mp3")))
-        os.remove(f"{title}.mp3")
+                         f"{rip_data[title]}.mp3")))
+        os.remove(f"{rip_data['id']}.mp3")
         await v_url.delete()
     elif video:
         await v_url.client.send_file(
             v_url.chat_id,
-            f"{title}.mp4",
+            f"{rip_data['id']}.mp4",
             supports_streaming=True,
             caption=rip_data['title'],
             progress_callback=lambda d, t: asyncio.get_event_loop(
             ).create_task(
                 progress(d, t, v_url, c_time, "Uploading..",
-                         f"{title}.mp4")))
-        os.remove(f"{title}.mp4")
+                         f"{rip_data['title']}.mp4")))
+        os.remove(f"{rip_data['id']}.mp4")
         await v_url.delete()
 
 
-async def deEmojify(inputString):
+def deEmojify(inputString):
     """ Remove emojis and other non-safe characters from string """
     return get_emoji_regexp().sub(u'', inputString)
 
@@ -689,12 +715,12 @@ CMD_HELP.update(
 CMD_HELP.update({
     'tts':
     '.tts <text> [or reply]\
-        \nUsage: Translates text to speech for the default language which is set.\nUse .lang <text> to set language for your TTS.'
+        \nUsage: Translates text to speech for the language which is set.\nUse .lang tts <language code> to set language for tts.'
 })
 CMD_HELP.update({
     'trt':
     '.trt <text> [or reply]\
-        \nUsage: Translates text to the default language which is set.\nUse .lang <text> to set language for your TTS.'
+        \nUsage: Translates text to the language which is set.\nUse .lang trt <language code> to set language for trt.'
 })
 CMD_HELP.update({'yt': '.yt <text>\
         \nUsage: Does a YouTube search.'})
@@ -702,6 +728,6 @@ CMD_HELP.update(
     {"imdb": ".imdb <movie-name>\nShows movie info and other stuffs"})
 CMD_HELP.update({
     'rip':
-    '.ripmp3 <url> or ripmp4 <url>\
+    '.rip audio <url> or rip video <url>\
         \nUsage: Download videos and songs from YouTube (and [many other sites](https://ytdl-org.github.io/youtube-dl/supportedsites.html)).'
 })

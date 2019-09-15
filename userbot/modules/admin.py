@@ -104,7 +104,7 @@ async def set_group_photo(gpic):
             await gpic.edit(PP_ERROR)
 
 
-@register(outgoing=True, pattern="^.promote(?: |$)(.*)")
+@register(outgoing=True, pattern="^.promote(?: |$)(.*) ?(.*)")
 @errors_handler
 async def promote(promt):
     """ For .promote command, promotes the replied/tagged person """
@@ -129,6 +129,8 @@ async def promote(promt):
     await promt.edit("`Promoting...`")
 
     user = await get_user_from_event(promt)
+    rank = str(promt.pattern_match.group(2)) if promt.pattern_match.group(
+        2) else "admeme"
     if user:
         pass
     else:
@@ -136,8 +138,8 @@ async def promote(promt):
 
     # Try to promote if current user is admin or creator
     try:
-        await promt.client(EditAdminRequest(promt.chat_id, user.id,
-                                            new_rights))
+        await promt.client(
+            EditAdminRequest(promt.chat_id, user.id, new_rights, rank))
         await promt.edit("`Promoted Successfully!`")
 
     # If Telethon spit BadRequestError, assume
@@ -154,7 +156,7 @@ async def promote(promt):
             f"CHAT: {promt.chat.title}(`{promt.chat_id}`)")
 
 
-@register(outgoing=True, pattern="^.demote(?: |$)(.*)")
+@register(outgoing=True, pattern="^.demote(?: |$)(.*) ?(.*)")
 @errors_handler
 async def demote(dmod):
     """ For .demote command, demotes the replied/tagged person """
@@ -171,6 +173,8 @@ async def demote(dmod):
     await dmod.edit("`Demoting...`")
 
     user = await get_user_from_event(dmod)
+    rank = str(dmod.pattern_match.group(2)) if dmod.pattern_match.group(
+        2) else "admeme"
     if user:
         pass
     else:
@@ -185,7 +189,8 @@ async def demote(dmod):
                                 pin_messages=None)
     # Edit Admin Permission
     try:
-        await dmod.client(EditAdminRequest(dmod.chat_id, user.id, newrights))
+        await dmod.client(
+            EditAdminRequest(dmod.chat_id, user.id, newrights, rank))
 
     # If we catch BadRequestError from Telethon
     # Assume we don't have permission to demote
@@ -533,7 +538,7 @@ async def rm_deletedacc(show):
                 del_u += 1
 
         if del_u > 0:
-            del_status = f"found **{del_u}** deleted account(s) in this group \
+            del_status = f"Found **{del_u}** deleted account(s) in this group,\
             \nclean them by using .delusers clean"
 
         await show.edit(del_status)
