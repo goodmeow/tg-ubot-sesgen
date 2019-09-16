@@ -551,7 +551,7 @@ async def youtube_search(query,
         return (nexttok, videos)
 
 
-@register(outgoing=True, pattern=r".rip (audio|video) (.*)")
+@register(outgoing=True, pattern=r".rip?(audio|video) (.*)")
 @errors_handler
 async def download_video(v_url):
     """ For .rip command, download media from YouTube + 800 other sites. """
@@ -730,6 +730,6 @@ CMD_HELP.update(
     {"imdb": ".imdb <movie-name>\nShows movie info and other stuffs"})
 CMD_HELP.update({
     'rip':
-    '.rip audio <url> or rip video <url>\
+    '.ripaudio <url> or ripvideo <url>\
         \nUsage: Download videos and songs from YouTube (and [many other sites](https://ytdl-org.github.io/youtube-dl/supportedsites.html)).'
 })

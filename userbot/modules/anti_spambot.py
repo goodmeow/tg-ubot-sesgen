@@ -9,12 +9,9 @@ from asyncio import sleep
 from requests import get
 
 from telethon.events import ChatAction
-from telethon.tl.functions.channels import EditBannedRequest
 from telethon.tl.types import ChannelParticipantsAdmins, Message
 
 from userbot import BOTLOG, BOTLOG_CHATID, CMD_HELP, ANTI_SPAMBOT, ANTI_SPAMBOT_SHOUT, bot
-from userbot.modules.admin import KICK_RIGHTS
-
 from userbot.events import errors_handler
 
 
@@ -155,9 +152,8 @@ async def ANTI_SPAMBOT(welcm):
                             f"USER:` [{check_user.first_name}](tg://user?id={check_user.id})"
                         )
 
-                        await welcm.client(
-                            EditBannedRequest(welcm.chat_id, check_user.id,
-                                              KICK_RIGHTS))
+                        await welcm.client.kick_participant(
+                            welcm.chat_id, check_user.id)
                         kicked = True
                         reported = False
 

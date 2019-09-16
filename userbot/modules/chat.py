@@ -5,8 +5,6 @@
 """ Userbot module containing userid, chatid and log commands"""
 
 from time import sleep
-
-from telethon.tl.functions.channels import LeaveChannelRequest
 from userbot import CMD_HELP, BOTLOG, BOTLOG_CHATID, bot
 from userbot.events import register, errors_handler
 
@@ -67,8 +65,8 @@ async def log(log_text):
 @errors_handler
 async def kickme(leave):
     """ Basically it's .kickme command """
-    await leave.edit("`Nope, no, no, I go away`")
-    await bot(LeaveChannelRequest(leave.chat_id))
+    await leave.edit("Nope, no, no, I go away")
+    await leave.client.kick_participant(leave.chat_id, 'me')
 
 
 @register(outgoing=True, pattern="^.unmutechat$")
