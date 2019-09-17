@@ -102,7 +102,7 @@ async def set_group_photo(gpic):
             await gpic.edit(PP_ERROR)
 
 
-@register(outgoing=True, pattern="^.promote(?: |$)(.*) ?(.*)")
+@register(outgoing=True, pattern="^.promote(?: |$)(.*)")
 @errors_handler
 async def promote(promt):
     """ For .promote command, promotes the replied/tagged person """
@@ -202,7 +202,7 @@ async def demote(dmod):
             f"CHAT: {dmod.chat.title}(`{dmod.chat_id}`)")
 
 
-@register(outgoing=True, pattern="^.ban(?: |$)(.*) ?(.*)")
+@register(outgoing=True, pattern="^.ban(?: |$)(.*)")
 @errors_handler
 async def ban(bon):
     """ For .ban command, bans the replied/tagged person """
@@ -293,7 +293,7 @@ async def nothanos(unbon):
         await unbon.edit("`Uh oh my unban logic broke!`")
 
 
-@register(outgoing=True, pattern="^.mute(?: |$)(.*) ?(.*)")
+@register(outgoing=True, pattern="^.mute(?: |$)(.*)")
 @errors_handler
 async def spider(spdr):
     """
@@ -476,7 +476,7 @@ async def ungmoot(un_gmute):
                 f"CHAT: {un_gmute.chat.title}(`{un_gmute.chat_id}`)")
 
 
-@register(outgoing=True, pattern="^.gmute(?: |$)(.*) ?(.*)")
+@register(outgoing=True, pattern="^.gmute(?: |$)(.*)")
 @errors_handler
 async def gspider(gspdr):
     """ For .gmute command, globally mutes the replied/tagged person """
@@ -664,7 +664,7 @@ async def pin(msg):
             f"LOUD: {not is_silent}")
 
 
-@register(outgoing=True, pattern="^.kick(?: |$)(.*) ?(.*)")
+@register(outgoing=True, pattern="^.kick(?: |$)(.*)")
 @errors_handler
 async def kick(usr):
     """ For .kick command, kicks the replied/tagged person from the group. """
@@ -678,7 +678,7 @@ async def kick(usr):
         await usr.edit(NO_ADMIN)
         return
 
-    user = await get_user_from_event(usr)
+    user, reason = await get_user_from_event(usr)
     if not user:
         await usr.edit("`Couldn't fetch user.`")
         return
@@ -688,11 +688,17 @@ async def kick(usr):
     try:
         await usr.client.kick_participant(usr.chat_id, user.id)
         await sleep(.5)
-    except:
-        await usr.edit(NO_PERM)
+    except Exception as e:
+        await usr.edit(NO_PERM + f"\n{str(e)}")
         return
 
-    await usr.edit(f"`Kicked` [{user.first_name}](tg://user?id={user.id})`!`")
+    if reason:
+        await usr.edit(
+            f"`Kicked` [{user.first_name}](tg://user?id={user.id})`!`\nReason: {reason}"
+        )
+    else:
+        await usr.edit(
+            f"`Kicked` [{user.first_name}](tg://user?id={user.id})`!`")
 
     if BOTLOG:
         await usr.client.send_message(
@@ -752,8 +758,7 @@ async def get_user_from_event(event, extra=None):
         user_obj = await event.client.get_entity(previous_message.from_id)
         extra = event.pattern_match.group(1)
     else:
-        user = event.pattern_match.group(1)
-        extra = event.pattern_match.group(2)
+        user, extra = event.pattern_match.group(1).split(' ', 1)
 
         if user.isnumeric():
             user = int(user)
