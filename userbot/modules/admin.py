@@ -751,14 +751,16 @@ async def get_users(show):
         remove("userslist.txt")
 
 
-async def get_user_from_event(event, extra=None):
+async def get_user_from_event(event):
     """ Get the user from argument or replied message. """
+    args = event.pattern_match.group(1).split(' ', 1)
     if event.reply_to_msg_id:
         previous_message = await event.get_reply_message()
         user_obj = await event.client.get_entity(previous_message.from_id)
         extra = event.pattern_match.group(1)
     else:
-        user, extra = event.pattern_match.group(1).split(' ', 1)
+        user = args[0]
+        extra = args[1]
 
         if user.isnumeric():
             user = int(user)
