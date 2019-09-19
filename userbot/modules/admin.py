@@ -760,7 +760,8 @@ async def get_user_from_event(event):
         extra = event.pattern_match.group(1)
     else:
         user = args[0]
-        extra = args[1]
+        if len(args) == 2:
+        	extra = args[1]
 
         if user.isnumeric():
             user = int(user)
