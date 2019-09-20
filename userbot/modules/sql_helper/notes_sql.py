@@ -35,7 +35,7 @@ def get_notes(chat_id):
 
 
 def add_note(chat_id, keyword, f_mesg_id):
-    to_check = get_filter(chat_id, keyword)
+    to_check = get_note(chat_id, keyword)
     if not to_check:
         adder = Notes(str(chat_id), keyword, f_mesg_id)
         SESSION.add(adder)
