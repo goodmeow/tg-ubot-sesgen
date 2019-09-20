@@ -20,8 +20,8 @@ async def on_snip(event):
     name = event.text[1:]
     snip = get_snip(name)
     if snip:
-        msg_o = await event.client.get_messages(
-            entity=Config.PRIVATE_CHANNEL_BOT_API_ID, ids=int(snip.f_mesg_id))
+        msg_o = await event.client.get_messages(entity=BOTLOG_CHATID,
+                                                ids=int(snip.f_mesg_id))
         message_id_to_reply = event.message.reply_to_msg_id
         if not message_id_to_reply:
             message_id_to_reply = None

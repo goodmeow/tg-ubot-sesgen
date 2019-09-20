@@ -28,7 +28,7 @@ async def filter_incoming_handler(handler):
             for trigger in filters:
                 pro = fullmatch(trigger.keyword, name, flags=IGNORECASE)
                 if pro:
-                    msg_o = await event.client.get_messages(
+                    msg_o = await handler.client.get_messages(
                         entity=BOTLOG_CHATID, ids=int(trigger.f_mesg_id))
                     await handler.reply(msg_o.message, file=msg_o.media)
     except AttributeError:

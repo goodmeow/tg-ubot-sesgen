@@ -67,11 +67,10 @@ async def add_filter(fltr):
         \nKEYWORD: {notename}\
         \nThe following message is saved as the note's reply data for the chat, please do NOT delete it !!"
         )
-        msg_o = await fltr.client.forward_messages(
-            entity=BOTLOG_CHATID,
-            messages=msg,
-            from_peer=new_handler.chat_id,
-            silent=True)
+        msg_o = await fltr.client.forward_messages(entity=BOTLOG_CHATID,
+                                                   messages=msg,
+                                                   from_peer=fltr.chat_id,
+                                                   silent=True)
     else:
         await fltr.edit("`This feature requires the BOTLOG_CHATID to be set.`")
         return
