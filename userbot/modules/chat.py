@@ -7,6 +7,7 @@
 from time import sleep
 from userbot import CMD_HELP, BOTLOG, BOTLOG_CHATID, bot
 from userbot.events import register, errors_handler
+from userbot.modules.admin import get_user_from_event
 
 
 @register(outgoing=True, pattern="^.userid$")
@@ -21,7 +22,6 @@ async def useridgetter(target):
                 name = "@" + message.sender.username
             else:
                 name = "**" + message.sender.first_name + "**"
-
         else:
             user_id = message.forward.sender.id
             if message.forward.sender.username:
@@ -30,6 +30,22 @@ async def useridgetter(target):
                 name = "*" + message.forward.sender.first_name + "*"
         await target.edit("**Name:** {} \n**User ID:** `{}`".format(
             name, user_id))
+
+
+@register(outgoing=True, pattern="^.mention(?: |$)(.*)")
+@errors_handler
+async def permalink(mention):
+    """ For .mention command, generates a link to the user's PM with a custom text. """
+    user, custom = await get_user_from_event(mention)
+    if not user:
+        await mention.edit("`User not found.`")
+        return
+    if custom:
+        await mention.edit(f"[{custom}](tg://user?id={user.id})")
+    else:
+        tag = user.first_name.replace("\u2060",
+                                      "") if user.first_name else user.username
+        await mention.edit(f"[{tag}](tg://user?id={user.id})")
 
 
 @register(outgoing=True, pattern="^.chatid$")
@@ -131,5 +147,7 @@ CMD_HELP.update({
 \n\n.unmutechat\
 \nUsage: Unmutes a muted chat.\
 \n\n.mutechat\
-\nUsage: Allows you to mute any chat."
+\nUsage: Allows you to mute any chat.\
+\n\n.mention <reply/tag> <optional text>\
+\nUsage: Generate a permanent link to the user's profile with optional custom text."
 })
