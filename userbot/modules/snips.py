@@ -5,17 +5,11 @@
 # From UniBorg by @Spechide
 """ Userbot module containing commands for keeping global notes. """
 
-from telethon import utils
-from telethon.tl import types
 from userbot.events import register, errors_handler
-from userbot import CMD_HELP
-
-TYPE_TEXT = 0
-TYPE_PHOTO = 1
-TYPE_DOCUMENT = 2
+from userbot import CMD_HELP, BOTLOG_CHATID
 
 
-@register(outgoing=True, pattern=r"\$\w*", ignore_unsafe=True)
+@register(outgoing=True, pattern=r"\$\.*", ignore_unsafe=True)
 @errors_handler
 async def on_snip(event):
     """ Snips logic. """
@@ -26,26 +20,15 @@ async def on_snip(event):
     name = event.text[1:]
     snip = get_snip(name)
     if snip:
-        if snip.snip_type == TYPE_PHOTO:
-            media = types.InputPhoto(int(snip.media_id),
-                                     int(snip.media_access_hash),
-                                     snip.media_file_reference)
-        elif snip.snip_type == TYPE_DOCUMENT:
-            media = types.InputDocument(int(snip.media_id),
-                                        int(snip.media_access_hash),
-                                        snip.media_file_reference)
-        else:
-            media = None
-
+        msg_o = await event.client.get_messages(
+            entity=Config.PRIVATE_CHANNEL_BOT_API_ID, ids=int(snip.f_mesg_id))
         message_id_to_reply = event.message.reply_to_msg_id
-
         if not message_id_to_reply:
             message_id_to_reply = None
-
         await event.client.send_message(event.chat_id,
-                                        snip.reply,
+                                        msg_o.message,
                                         reply_to=message_id_to_reply,
-                                        file=media)
+                                        file=msg_o.media)
         await event.delete()
 
 
@@ -63,52 +46,47 @@ async def on_snip_save(event):
     if not msg:
         await event.edit("`I need something to save as a snip.`")
         return
-    else:
-        snip = {'type': TYPE_TEXT, 'text': msg.message or ''}
-        if msg.media:
-            media = None
-            if isinstance(msg.media, types.MessageMediaPhoto):
-                media = utils.get_input_photo(msg.media.photo)
-                snip['type'] = TYPE_PHOTO
-            elif isinstance(msg.media, types.MessageMediaDocument):
-                media = utils.get_input_document(msg.media.document)
-                snip['type'] = TYPE_DOCUMENT
-            if media:
-                snip['id'] = media.id
-                snip['hash'] = media.access_hash
-                snip['fr'] = media.file_reference
-
+    elif BOTLOG_CHATID:
+        await event.client.send_message(
+            BOTLOG_CHATID, f"#SNIP\
+        \nKEYWORD: {name}\
+        \nThe following message is saved as the data for the snip, please do NOT delete it !!"
+        )
+        msg_o = await event.client.forward_messages(entity=BOTLOG_CHATID,
+                                                    messages=msg,
+                                                    from_peer=event.chat_id,
+                                                    silent=True)
         success = "`Snip {} successfully. Use` **${}** `anywhere to get it`"
-
-        if add_snip(name, snip['text'], snip['type'], snip.get('id'),
-                    snip.get('hash'), snip.get('fr')) is False:
+        if add_snip(name, msg_o.id) is False:
             await event.edit(success.format('updated', name))
         else:
             await event.edit(success.format('saved', name))
+    else:
+        await event.edit(
+            "`This feature requires the BOTLOG_CHATID to be set up.`")
+        return
 
 
 @register(outgoing=True, pattern="^.snips$")
 @errors_handler
 async def on_snip_list(event):
     """ For .snips command, lists snips saved by you. """
-    if not event.text[0].isalpha() and event.text[0] not in ("/", "#", "@",
-                                                             "!"):
-        try:
-            from userbot.modules.sql_helper.snips_sql import get_snips
-        except AttributeError:
-            await event.edit("`Running on Non-SQL mode!`")
-            return
+    try:
+        from userbot.modules.sql_helper.snips_sql import get_snips
+    except AttributeError:
+        await event.edit("`Running on Non-SQL mode!`")
+        return
 
-        message = "`No snips available right now.`"
-        all_snips = get_snips()
-        for a_snip in all_snips:
-            if message == "`No snips available right now.`":
-                message = "Available snips:\n"
-                message += f"- `${a_snip.snip}`\n"
-            else:
-                message += f"- `${a_snip.snip}`\n"
+    message = "`No snips available right now.`"
+    all_snips = get_snips()
+    for a_snip in all_snips:
+        if message == "`No snips available right now.`":
+            message = "Available snips:\n"
+            message += f"`${a_snip.snip}`\n"
+        else:
+            message += f"`${a_snip.snip}`\n"
 
-        await event.edit(message)
+    await event.edit(message)
 
 
 @register(outgoing=True, pattern="^.remsnip (.*)")

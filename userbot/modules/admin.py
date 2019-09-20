@@ -761,7 +761,7 @@ async def get_user_from_event(event):
     else:
         user = args[0]
         if len(args) == 2:
-        	extra = args[1]
+            extra = args[1]
 
         if user.isnumeric():
             user = int(user)

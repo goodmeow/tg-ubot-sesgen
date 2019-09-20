@@ -63,7 +63,7 @@ async def torrent_download(event):
 
 @register(outgoing=True, pattern="^.aria url(?: |$)(.*)")
 async def magnet_download(event):
-    uri = event.pattern_match.group(1)
+    uri = [event.pattern_match.group(1)]
     try:  # Add URL Into Queue
         download = aria2.add_uris(uri, options=None, position=None)
     except Exception as e:

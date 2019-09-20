@@ -129,7 +129,6 @@ async def ANTI_SPAMBOT(welcm):
                     continue  # Check the next messsage
 
             if spambot:
-
                 chat = await welcm.get_chat()
                 admin = chat.admin_rights
                 creator = chat.creator
@@ -149,7 +148,7 @@ async def ANTI_SPAMBOT(welcm):
                             "`Potential Spambot Detected !!`\n"
                             f"`REASON:` {reason}\n"
                             "Kicking away for now, will log the ID for further purposes.\n"
-                            f"USER:` [{check_user.first_name}](tg://user?id={check_user.id})"
+                            f"`USER:` [{check_user.first_name}](tg://user?id={check_user.id})"
                         )
 
                         await welcm.client.kick_participant(

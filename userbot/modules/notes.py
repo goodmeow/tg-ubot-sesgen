@@ -7,33 +7,26 @@
 
 from userbot import BOTLOG, BOTLOG_CHATID, CMD_HELP
 from userbot.events import register, errors_handler
-from telethon.tl import types
-from telethon import utils
-
-TYPE_TEXT = 0
-TYPE_PHOTO = 1
-TYPE_DOCUMENT = 2
+from asyncio import sleep
 
 
 @register(outgoing=True, pattern="^.notes$")
 @errors_handler
 async def notes_active(svd):
-    """ For .saved command, list all of the notes saved in a chat. """
+    """ For .notes command, list all of the notes saved in a chat. """
     try:
         from userbot.modules.sql_helper.notes_sql import get_notes
     except AttributeError:
         await svd.edit("`Running on Non-SQL mode!`")
         return
-
     message = "`There are no saved notes in this chat`"
     notes = get_notes(svd.chat_id)
     for note in notes:
         if message == "`There are no saved notes in this chat`":
             message = "Notes saved in this chat:\n"
-            message += "- `#{}`\n".format(note.keyword)
+            message += "`#{}`\n".format(note.keyword)
         else:
-            message += "- `#{}`\n".format(note.keyword)
-
+            message += "`#{}`\n".format(note.keyword)
     await svd.edit(message)
 
 
@@ -63,28 +56,26 @@ async def add_filter(fltr):
     except AttributeError:
         await fltr.edit("`Running on Non-SQL mode!`")
         return
-
     notename = fltr.pattern_match.group(1)
     msg = await fltr.get_reply_message()
     if not msg:
         await fltr.edit("`I need something to save as a note.`")
+    elif BOTLOG_CHATID:
+        await fltr.client.send_message(
+            BOTLOG_CHATID, f"#NOTE\
+        \nCHAT: {fltr.chat.title}\
+        \nKEYWORD: {notename}\
+        \nThe following message is saved as the note's reply data for the chat, please do NOT delete it !!"
+        )
+        msg_o = await fltr.client.forward_messages(
+            entity=BOTLOG_CHATID,
+            messages=msg,
+            from_peer=new_handler.chat_id,
+            silent=True)
     else:
-        snip = {'type': TYPE_TEXT, 'text': msg.message or ''}
-        if msg.media:
-            media = None
-            if isinstance(msg.media, types.MessageMediaPhoto):
-                media = utils.get_input_photo(msg.media.photo)
-                snip['type'] = TYPE_PHOTO
-            elif isinstance(msg.media, types.MessageMediaDocument):
-                media = utils.get_input_document(msg.media.document)
-                snip['type'] = TYPE_DOCUMENT
-            if media:
-                snip['id'] = media.id
-                snip['hash'] = media.access_hash
-                snip['fr'] = media.file_reference
-
+        await fltr.edit("`This feature requires the BOTLOG_CHATID to be set.`")
+        return
     success = "`Note {} successfully. Use` #{} `to get it`"
-
     if add_note(str(fltr.chat_id), notename, snip['text'], snip['type'],
                 snip.get('id'), snip.get('hash'), snip.get('fr')) is False:
         return await fltr.edit(success.format('updated', notename))
@@ -92,7 +83,7 @@ async def add_filter(fltr):
         return await fltr.edit(success.format('added', notename))
 
 
-@register(pattern=r"#\w*", disable_edited=True)
+@register(pattern=r"#\.*", disable_edited=True)
 @errors_handler
 async def incom_note(getnt):
     """ Notes logic. """
@@ -127,11 +118,11 @@ async def incom_note(getnt):
         pass
 
 
-@register(outgoing=True, pattern="^.rmnotes (.*)")
+@register(outgoing=True, pattern="^.rmbotnotes (.*)")
 @errors_handler
 async def kick_marie_notes(kick):
-    """ For .rmfilters command, allows you to kick all \
-        Marie(or her clones) filters from a chat. """
+    """ For .rmbotnotes command, allows you to kick all \
+        Marie(or her clones) notes from a chat. """
     bot_type = kick.pattern_match.group(1).lower()
     if bot_type not in ["marie", "rose"]:
         await kick.edit("`That bot is not yet supported!`")
@@ -165,5 +156,6 @@ CMD_HELP.update({
 \nUsage: Gets all saved notes in a chat.\
 \n\n.clear <notename>\
 \nUsage: Deletes the specified note.\
-"
+\n\n.rmbotnotes <bot_name>\
+\nUsage: Removes all notes of admin bots (Currently supported: Marie, Rose and their clones.) in the chat."
 })

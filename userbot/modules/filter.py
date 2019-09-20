@@ -7,14 +7,8 @@
 
 from asyncio import sleep
 from re import fullmatch, IGNORECASE, escape
-from telethon.tl import types
-from telethon import utils
 from userbot import BOTLOG, BOTLOG_CHATID, CMD_HELP
 from userbot.events import register, errors_handler
-
-TYPE_TEXT = 0
-TYPE_PHOTO = 1
-TYPE_DOCUMENT = 2
 
 
 @register(incoming=True, disable_edited=True)
@@ -27,7 +21,6 @@ async def filter_incoming_handler(handler):
             except AttributeError:
                 await handler.edit("`Running on Non-SQL mode!`")
                 return
-
             name = handler.raw_text
             filters = get_filters(handler.chat_id)
             if not filters:
@@ -35,19 +28,9 @@ async def filter_incoming_handler(handler):
             for trigger in filters:
                 pro = fullmatch(trigger.keyword, name, flags=IGNORECASE)
                 if pro:
-                    if trigger.snip_type == TYPE_PHOTO:
-                        media = types.InputPhoto(
-                            int(trigger.media_id),
-                            int(trigger.media_access_hash),
-                            trigger.media_file_reference)
-                    elif trigger.snip_type == TYPE_DOCUMENT:
-                        media = types.InputDocument(
-                            int(trigger.media_id),
-                            int(trigger.media_access_hash),
-                            trigger.media_file_reference)
-                    else:
-                        media = None
-                    await handler.reply(trigger.reply, file=media)
+                    msg_o = await event.client.get_messages(
+                        entity=BOTLOG_CHATID, ids=int(trigger.f_mesg_id))
+                    await handler.reply(msg_o.message, file=msg_o.media)
     except AttributeError:
         pass
 
@@ -61,38 +44,35 @@ async def add_new_filter(new_handler):
     except AttributeError:
         await new_handler.edit("`Running on Non-SQL mode!`")
         return
-
     keyword = new_handler.pattern_match.group(1)
     msg = await new_handler.get_reply_message()
     if not msg:
         await new_handler.edit(
             "`I need something to save as reply to the filter.`")
+    elif BOTLOG_CHATID:
+        await new_handler.client.send_message(
+            BOTLOG_CHATID, f"#FILTER\
+        \nCHAT: {new_handler.chat.title}\
+        \nTRIGGER: {keyword}\
+        \nThe following message is saved as the filter's reply data for the chat, please do NOT delete it !!"
+        )
+        msg_o = await new_handler.client.forward_messages(
+            entity=BOTLOG_CHATID,
+            messages=msg,
+            from_peer=new_handler.chat_id,
+            silent=True)
     else:
-        snip = {'type': TYPE_TEXT, 'text': msg.message or ''}
-        if msg.media:
-            media = None
-            if isinstance(msg.media, types.MessageMediaPhoto):
-                media = utils.get_input_photo(msg.media.photo)
-                snip['type'] = TYPE_PHOTO
-            elif isinstance(msg.media, types.MessageMediaDocument):
-                media = utils.get_input_document(msg.media.document)
-                snip['type'] = TYPE_DOCUMENT
-            if media:
-                snip['id'] = media.id
-                snip['hash'] = media.access_hash
-                snip['fr'] = media.file_reference
-
+        await new_handler.edit(
+            "`This feature requires the BOTLOG_CHATID to be set.`")
+        return
     success = "`Filter` **{}** `{} successfully`"
-
-    if add_filter(str(new_handler.chat_id), keyword,
-                  snip['text'], snip['type'], snip.get('id'), snip.get('hash'),
-                  snip.get('fr')) is True:
+    if add_filter(str(new_handler.chat_id), keyword, msg_o.id) is True:
         await new_handler.edit(success.format(keyword, 'added'))
     else:
         await new_handler.edit(success.format(keyword, 'updated'))
 
 
-@register(outgoing=True, pattern="^.stop\\s.*")
+@register(outgoing=True, pattern="^.stop (.*)")
 @errors_handler
 async def remove_a_filter(r_handler):
     """ For .stop command, allows you to remove a filter from a chat. """
@@ -101,9 +81,7 @@ async def remove_a_filter(r_handler):
     except AttributeError:
         await r_handler.edit("`Running on Non-SQL mode!`")
         return
-
-    filt = r_handler.text[6:]
-
+    filt = r_handler.pattern_match.group(1)
     if not remove_filter(r_handler.chat_id, filt):
         await r_handler.edit("`Filter` **{}** `doesn't exist.`".format(filt))
     else:
@@ -111,13 +89,13 @@ async def remove_a_filter(r_handler):
             "`Filter` **{}** `was deleted successfully`".format(filt))
 
 
-@register(outgoing=True, pattern="^.rmfilters (.*)")
+@register(outgoing=True, pattern="^.rmbotfilters (.*)")
 @errors_handler
 async def kick_marie_filter(event):
     """ For .rmfilters command, allows you to kick all \
         Marie(or her clones) filters from a chat. """
     cmd = event.text[0]
-    bot_type = event.pattern_match.group(1)
+    bot_type = event.pattern_match.group(1).lower()
     if bot_type not in ["marie", "rose"]:
         await event.edit("`That bot is not yet supported!`")
         return
@@ -150,7 +128,6 @@ async def filters_active(event):
         return
     transact = "`There are no filters in this chat.`"
     filters = get_filters(event.chat_id)
-
     for filt in filters:
         if transact == "`There are no filters in this chat.`":
             transact = "Active filters in this chat:\n"
@@ -171,6 +148,6 @@ CMD_HELP.update({
     \nWorks with everything from files to stickers.\
     \n\n.stop <filter>\
     \nUsage: Stops the specified filter.\
-    \n\n.rmfilters <marie/rose>\
-    \nUsage: Removes all filters of Bots(Eg:Marie or Rose) in a chat."
+    \n\n.rmbotfilters <marie/rose>\
+    \nUsage: Removes all filters of admin bots (Currently supported: Marie, Rose and their clones.) in the chat."
 })
