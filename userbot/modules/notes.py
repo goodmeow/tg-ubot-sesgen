@@ -49,7 +49,7 @@ async def remove_notes(clr):
 
 @register(outgoing=True, pattern=r"^.save (.*)")
 @errors_handler
-async def add_filter(fltr):
+async def add_note(fltr):
     """ For .save command, saves notes in a chat. """
     try:
         from userbot.modules.sql_helper.notes_sql import add_note
@@ -75,8 +75,7 @@ async def add_filter(fltr):
         await fltr.edit("`This feature requires the BOTLOG_CHATID to be set.`")
         return
     success = "`Note {} successfully. Use` #{} `to get it`"
-    if add_note(str(fltr.chat_id), notename, snip['text'], snip['type'],
-                snip.get('id'), snip.get('hash'), snip.get('fr')) is False:
+    if add_note(str(fltr.chat_id), notename, msg_o.id) is False:
         return await fltr.edit(success.format('updated', notename))
     else:
         return await fltr.edit(success.format('added', notename))
@@ -89,30 +88,22 @@ async def incom_note(getnt):
     try:
         if not (await getnt.get_sender()).bot:
             try:
-                from userbot.modules.sql_helper.notes_sql import get_notes
+                from userbot.modules.sql_helper.notes_sql import get_note
             except AttributeError:
                 return
             notename = getnt.text[1:]
-            notes = get_notes(getnt.chat_id)
-            for note in notes:
-                if notename == note.keyword:
-                    if note.snip_type == TYPE_PHOTO:
-                        media = types.InputPhoto(int(note.media_id),
-                                                 int(note.media_access_hash),
-                                                 note.media_file_reference)
-                    elif note.snip_type == TYPE_DOCUMENT:
-                        media = types.InputDocument(
-                            int(note.media_id), int(note.media_access_hash),
-                            note.media_file_reference)
-                    else:
-                        media = None
-                    message_id = getnt.message.id
-                    if getnt.reply_to_msg_id:
-                        message_id = getnt.reply_to_msg_id
-                    await getnt.client.send_message(getnt.chat_id,
-                                                    note.reply,
-                                                    reply_to=message_id,
-                                                    file=media)
+            note = get_note(getnt.chat_id, notename)
+            if note:
+                msg_o = await getnt.client.get_messages(entity=BOTLOG_CHATID,
+                                                        ids=int(
+                                                            note.f_mesg_id))
+                message_id_to_reply = getnt.message.reply_to_msg_id
+                if not message_id_to_reply:
+                    message_id_to_reply = None
+                await getnt.client.send_message(getnt.chat_id,
+                                                msg_o.message,
+                                                reply_to=message_id_to_reply,
+                                                file=msg_o.media)
     except AttributeError:
         pass
 
